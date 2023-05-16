@@ -1,5 +1,3 @@
-import { settings } from "./settings.js";
-
 export function Controller() {
     let myModel = null;
     let myMenu = null;
@@ -10,8 +8,6 @@ export function Controller() {
     let rules = null;
     let soundMovement = null;
     let soundMotor = null;
-    let soundShoot = null;
-    // this.soundShoot = null;
 
     this.init = function(model, menu, levels){
         myModel = model;
@@ -36,7 +32,7 @@ export function Controller() {
         soundMovement.loop = true;
         soundMotor = new Audio('sound/sound_motor.ogg');
         soundMotor.loop = true;
-        soundShoot = new Audio('sound/sound_bullet_shot.ogg');
+        soundMotor.volume = 0.2;
     }
 
     this.showStatistics = function(){
@@ -54,44 +50,35 @@ export function Controller() {
         addEventListener('keydown', function (e){
             switch (e.code) {
                 case 'ArrowUp':
-                    settings.isMoving = true;
-                    settings.key = 'ArrowUp';
-                    myModel.playerOneKeydown();
-                    
+                    myModel.isMoving = true;
+                    myModel.key = 'ArrowUp';                    
 
                     soundMovement.play();
                     soundMotor.pause();
                     break;
                 case 'ArrowDown':
-                    settings.isMoving = true;
-                    settings.key = 'ArrowDown';
-                    myModel.playerOneKeydown();
-                    
+                    myModel.isMoving = true;
+                    myModel.key = 'ArrowDown';                    
 
                     soundMovement.play();
                     soundMotor.pause();
                     break;
                 case 'ArrowLeft':
-                    settings.isMoving = true;
-                    settings.key = 'ArrowLeft';
-                    myModel.playerOneKeydown();
-                    
+                    myModel.isMoving = true;
+                    myModel.key = 'ArrowLeft';                    
 
                     soundMovement.play();
                     soundMotor.pause();
                     break;
                 case 'ArrowRight':
-                    settings.isMoving = true;
-                    settings.key = 'ArrowRight';
-                    myModel.playerOneKeydown();
-                    
+                    myModel.isMoving = true;
+                    myModel.key = 'ArrowRight';                    
 
                     soundMovement.play();
                     soundMotor.pause();
                     break;
                 case 'Space':
-                    settings.isShoots = true;
-                    // soundShoot.play();
+                    myModel.isShoots = true;
 
                     myModel.playerOneShiftKeydown();
                     break;
@@ -103,31 +90,31 @@ export function Controller() {
         addEventListener('keyup', function (e){
             switch (e.code) {
                 case 'ArrowUp':
-                    settings.isMoving = false;
-                
+                    myModel.isMoving = false;
+
                     soundMotor.play();
                     soundMovement.pause();
                     break;
                 case 'ArrowDown':
-                    settings.isMoving = false;
+                    myModel.isMoving = false;
 
                     soundMotor.play();
                     soundMovement.pause();
                     break;
                 case 'ArrowLeft':
-                    settings.isMoving = false;
+                    myModel.isMoving = false;
 
                     soundMotor.play();
                     soundMovement.pause();
                     break;
                 case 'ArrowRight':
-                    settings.isMoving = false;
+                    myModel.isMoving = false;
 
                     soundMotor.play();
                     soundMovement.pause();
                     break;
                 case 'Space':
-                    settings.isShoots = false;
+                    myModel.isShoots = false;
                     break;
                 default:
                     break;

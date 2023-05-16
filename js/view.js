@@ -1,6 +1,5 @@
-import { settings, BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, BULLET_SIZE, EXPLOSION_SIZE } from "./settings.js";
+import { BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, BULLET_SIZE, EXPLOSION_SIZE, EAGLE_SIZE, TANK_SIZE } from "./constants.js";
 import { spriteMap } from "./sprite-map.js";
-// import { levels } from "./levels.js";
 
 export function View(){
     let myMenu = null;
@@ -48,13 +47,13 @@ export function View(){
     }
 
     //отрисовка орла
-    this.drawEagle = function(){
-        ctx.drawImage(image, 4 * 32, 9 * 32, 32, 32, 13 * BLOCK_WIDTH, 24 * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
+    this.drawEagle = function(num){
+        ctx.drawImage(image, ...spriteMap[num], 12 * BLOCK_WIDTH, 24 * BLOCK_HEIGHT, EAGLE_SIZE, EAGLE_SIZE);
     }
 
     //отрисовка танка
-    this.drawPlayerOne = function (direction){
-        ctx.drawImage(image, ...spriteMap[direction], settings.playerOnePosX, settings.playerOnePosY, settings.tankSize, settings.tankSize);
+    this.drawPlayerOne = function (direction, x, y){
+        ctx.drawImage(image, ...spriteMap[direction], x, y, TANK_SIZE, TANK_SIZE);
     }
 
     //отрисовка пули
