@@ -14,33 +14,38 @@ body{
     color: #fff;
     letter-spacing: 4px;
 }
-/* Start start */
-.menu{
-    text-align: center;
+#content{
     height: 100%;
     width: 100%;
+    position: relative;
 }
-.start {
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    transition-property: top;
-    transition-duration: 2s;
-    transition-timing-function: linear;
+/* Start start */
+.menu{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: 3s top linear;
 }
 .img__wrapper{
-    margin: 0 auto;
-    width: 385px;
+    display: inline-block;
+    width: 377px;
     height: 143px;
-    overflow: hidden;
+    background: url(img/sprite2.png);
+    background-position: -260px 0px;
+    background-repeat: no-repeat;
     margin-bottom: 50px;
 }
-.start__img {
-    position: relative;
-    top: 0;
-    left: -260px;
+ul{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
 }
 li{
+    display: inline-block;
     margin-bottom: 10px;
     list-style: none;
     position: relative;
@@ -48,24 +53,19 @@ li{
 li:last-child{
     margin: 0;
 }
-/* li:before */
 li:hover:before{
-    display: inline-block;
     content: '';
-    background: url(img/tank_right.png);
-    background-repeat: no-repeat;
+    display: inline-block;
     width: 32px;
     height: 32px;
+    background: url(img/tank_right.png);
+    background-repeat: no-repeat;
     position: absolute;
-    top: 5px; 
-    left: -30px;
-    /* width: 30px;
-    height: 30px;
-    background: url(img/sprite2.png);
-    background-position: -95px 0;
-    background-repeat: no-repeat; */
+    top: 7px;
+    left: -48px;
 }
 .list{
+    display: inline-block;
     font-size: 40px;
     text-decoration: none;
     color: #fff;
@@ -73,33 +73,25 @@ li:hover:before{
 /* Start end */
 /* Rules start*/
 .rules {
-    height: 100%;
-    width: 100%;
-}
-.rules__wrapper {
-    width: 100%;
     position: relative;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(0, -50%);
 }
 .rules__title {
     text-align: center;
     margin-bottom: 50px;
     font-size: 40px;
 }
-.rules__players{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 70px;
+.rules__text_wrap{
+    display: inline-block;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin-bottom: 30px;
 }
 .rules__player {
     margin-bottom: 30px;
     font-size: 30px;
-}
-.rules__text_wrap{
-    margin-bottom: 30px;
 }
 .rules__text {
     display: block;
@@ -113,9 +105,9 @@ li:hover:before{
 .rules__wish {
     text-align: center;
     font-size: 30px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
-.rules__back{
+.back{
     display: block;
     text-align: center;
     font-size: 30px;
@@ -125,24 +117,25 @@ li:hover:before{
 /* Rules end*/
 /* Level start */
 .level {
+    display: none;
     height: 100%;
     width: 100%;
     background-color: hsl(0, 0%, 39%);
 }
-.level__wrap {
-    width: 100%;
+.level__txt {
     text-align: center;
     position: relative;
     top: 50%;
     transform: translate(0, -50%);
-}
-.level__txt {
     font-size: 60px;
     color: #000;
 }
+.level_active{
+    display: block;
+}
 /* Level end */
 /* Statistics start */
-.statistics {
+/* .statistics {
     height: 100%;
     width: 100%;
 }
@@ -152,7 +145,7 @@ li:hover:before{
     position: relative;
     top: 50%;
     transform: translate(0, -50%);
-}
+} */
 /* Statistics end */
 /* Canvas start*/
 .canvas__wrap {
@@ -164,12 +157,23 @@ li:hover:before{
     height: 100%;
     background-color: #636363;
 }
+.canvas__wrapper{
+    position: relative;
+}
+.game_over{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 50px;
+    max-width: 160px;
+    color: #cc1313;
+}
 .canvas{
     display: inline-block;
 }
 .canvas__info {
     display: inline-block;
-    /* flex-direction: column; */
     align-items: center;
     justify-content: space-around;
     color: #000;
@@ -188,8 +192,6 @@ li:hover:before{
     background-position: -160px -256px;
     background-repeat: no-repeat;
 }
-/* .canvas__players {
-} */
 .canvas__lives{
     margin-bottom: 20px;
 }
@@ -218,6 +220,10 @@ li:hover:before{
 }
 /* Canvas end*/
 .scoring {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: hsl(0, 0%, 39%);
 }
 .scoring__stage {
 }
