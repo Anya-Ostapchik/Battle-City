@@ -78,7 +78,10 @@ const mySPA = (function () {
     }
 
     this.updateState = function(_pageName) {
-      myModuleView.renderContent(_pageName);
+      if(sessionStorage.getItem("is_reloaded")){
+        _pageName = 'main';
+      }
+        myModuleView.renderContent(_pageName);
     }
   }
 
@@ -95,6 +98,10 @@ const mySPA = (function () {
       // вешаем слушателей на событие hashchange и beforeunload
       window.addEventListener("hashchange", this.updateState);
 
+      window.addEventListener('click', function (){
+        sessionStorage.removeItem("is_reloaded");
+      });
+
       myModuleContainer.querySelector("#mainmenu").addEventListener("click", function (event) {
         event.preventDefault();
         window.location.hash = event.target.getAttribute("href");
@@ -102,8 +109,6 @@ const mySPA = (function () {
 
 
       // window.onbeforeunload = function() {
-      //   hashPageName = 'main';
-      //   myModuleModel.updateState(hashPageName);
       //   return false;
       // };
 
@@ -120,6 +125,9 @@ const mySPA = (function () {
 
   return {
     init: function (root, routes, components) {
+      sessionStorage.setItem("is_reloaded", true);
+      location.hash = '#main';
+
       this.renderComponents(root, components);
 
       const view = new ModuleView();

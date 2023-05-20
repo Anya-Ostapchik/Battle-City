@@ -56,8 +56,8 @@ export function View(){
         ctx.drawImage(image, ...spriteMap[direction], x, y, TANK_SIZE, TANK_SIZE);
     }
 
-    //отрисовка пули
-    this.drawPlayerOneBullet = (num, x, y) => {
+    //отрисовка пули drawBullet
+    this.drawBullet = (num, x, y) => {
         ctx.drawImage(image, ...spriteMap[num], x, y, BULLET_SIZE, BULLET_SIZE);
     }
 
@@ -77,6 +77,10 @@ export function View(){
         // setTimeout(() => {
         //     this.showScoring();
         // }, 1000);
+    }
+
+    this.drawEnemyTanks = function(num, x, y){
+        ctx.drawImage(image, ...spriteMap[num], x, y, TANK_SIZE, TANK_SIZE);
     }
 
     this.showScoring = function(){
@@ -138,7 +142,6 @@ export function View(){
 
         myContent.append(scoring);
     }
-    this.drawEnemyTanks = function(num, x, y){
-        ctx.drawImage(image, ...spriteMap[num], x, y, TANK_SIZE, TANK_SIZE);
-    }
+
+    
 }

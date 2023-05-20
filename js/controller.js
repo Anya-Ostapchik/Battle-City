@@ -12,6 +12,13 @@ export function Controller() {
                 this.gameStartOnePlayer();
             }
         });
+
+    //     window.onbeforeunload = function() {
+    //         // hashPageName = 'main';
+    //         // myModuleModel.updateState(hashPageName);
+    //         location.hash = '#main';
+    //         return false;
+    //   };
     }
 
     this.gameStartOnePlayer = () => {
