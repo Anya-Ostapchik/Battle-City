@@ -29,12 +29,16 @@ export function Model(){
     this.animation = false;
     this.game = false;
     this.Enemies = null;
-
+    this.countTanks = 0; //количество танков на поле
+    this.k = 1;
+    this.enemiesPosY = 0;
+    this.enemiesPos = [];
+    this.allEnemiesTanks = 0; //количество всех созданных танков
+    this.enemies = []; //массив с врагами, которые сейчас на поле
     
     this.init = function(view){
         myView = view;
         this.Enemies = new Enemies();
-
         this.soundStageStart = new Audio('sound/sound_stage_start.ogg');
         this.soundShoot = new Audio('sound/sound_bullet_shot.ogg');
         this.soundBulletHit1 = new Audio('sound/sound_bullet_hit_1.ogg');
@@ -77,17 +81,52 @@ export function Model(){
         myView.drawRemainingTanks();
     }
 
-    this.drawEnemyTanks = function(){
-        this.Enemies.init(myView, this.level, this.blocks, this.playerX, this.playerY);
+    this.drawEnemyTanks = () => {
+        const animId = requestAnimationFrame(this.drawEnemyTanks);
+
+        if(this.allEnemiesTanks >= 20){
+            cancelAnimationFrame(animId);
+
+            // this.showScore();
+            // this.nextLevel();
+        }
+
+        if(this.countTanks < 4){
+            if(this.k === 1){
+                this.enemiesPosX = 0;
+                this.k++;
+            }else if(this.k === 2){
+                this.enemiesPosX = CANVAS_WIDTH / 2 - TANK_SIZE;
+                this.k++;
+            }else if(this.k === 3){
+                this.enemiesPosX = CANVAS_WIDTH - TANK_SIZE;
+                this.k = 1;
+            }
+
+            this.enemies.push(new Enemies());
+
+            this.enemies[this.countTanks].init(myView, this.enemiesPosX, this.enemiesPosY, this.level, this.blocks);
+
+            myView.deleteTankIcon();
+
+            this.countTanks++;
+            this.allEnemiesTanks++;
+        }
+
+        for (let i = 0; i < this.countTanks; i++) {
+            this.enemiesPos[i] = this.enemies[i].giveEnemiesPos();;
+        }
     }
 
     this.checkCollisionTank = function(){
         switch (this.key) {
             case 'ArrowUp':
-                if(this.playerX + TANK_SIZE >= this.enemiesPos.x && this.playerX <= this.enemiesPos.x + TANK_SIZE && this.playerY <= this.enemiesPos.y + TANK_SIZE && this.playerY >= this.enemiesPos.y){
-                    this.playerSpeedY = 0;
+                for(let i = 0; i < this.enemiesPos.length; i++){
+                    if(this.playerX + TANK_SIZE >= this.enemiesPos[i].x && this.playerX <= this.enemiesPos[i].x + TANK_SIZE && this.playerY <= this.enemiesPos[i].y + TANK_SIZE && this.playerY >= this.enemiesPos[i].y){
+                        this.playerSpeedY = 0;
+                    }
                 }
-
+                
                 this.blocks.find(item => {
                     if(this.playerX + TANK_SIZE > item.x + MEASUREMENT_ERROR && this.playerX < item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY === item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.playerSpeedY = 0;
@@ -101,8 +140,10 @@ export function Model(){
                 break;
         
             case 'ArrowDown':
-                if(this.playerX + TANK_SIZE >= this.enemiesPos.x && this.playerX <= this.enemiesPos.x + TANK_SIZE && this.playerY + TANK_SIZE >= this.enemiesPos.y && this.playerY + TANK_SIZE <= this.enemiesPos.y + TANK_SIZE){
-                    this.playerSpeedY = 0;
+                for(let i = 0; i < this.enemiesPos.length; i++){
+                    if(this.playerX + TANK_SIZE >= this.enemiesPos[i].x && this.playerX <= this.enemiesPos[i].x + TANK_SIZE && this.playerY + TANK_SIZE >= this.enemiesPos[i].y && this.playerY + TANK_SIZE <= this.enemiesPos[i].y + TANK_SIZE){
+                        this.playerSpeedY = 0;
+                    }
                 }
 
                 this.blocks.find(item => {
@@ -123,8 +164,10 @@ export function Model(){
                 break;
         
             case 'ArrowLeft':
-                if(this.playerX <= this.enemiesPos.x + TANK_SIZE && this.playerX >= this.enemiesPos.x && this.playerY + TANK_SIZE >= this.enemiesPos.y && this.playerY <= this.enemiesPos.y + TANK_SIZE){
-                    this.playerSpeedX = 0;
+                for(let i = 0; i < this.enemiesPos.length; i++){
+                    if(this.playerX <= this.enemiesPos[i].x + TANK_SIZE && this.playerX >= this.enemiesPos[i].x && this.playerY + TANK_SIZE >= this.enemiesPos[i].y && this.playerY <= this.enemiesPos[i].y + TANK_SIZE){
+                        this.playerSpeedX = 0;
+                    }
                 }
 
                 this.blocks.find(item => {
@@ -145,8 +188,10 @@ export function Model(){
                 break;
         
             case 'ArrowRight':
-                if(this.playerX + TANK_SIZE >= this.enemiesPos.x && this.playerX + TANK_SIZE <= this.enemiesPos.x + TANK_SIZE && this.playerY + TANK_SIZE >= this.enemiesPos.y && this.playerY <= this.enemiesPos.y + TANK_SIZE){
-                    this.playerSpeedX = 0;
+                for(let i = 0; i < this.enemiesPos.length; i++){
+                    if(this.playerX + TANK_SIZE >= this.enemiesPos[i].x && this.playerX + TANK_SIZE <= this.enemiesPos[i].x + TANK_SIZE && this.playerY + TANK_SIZE >= this.enemiesPos[i].y && this.playerY <= this.enemiesPos[i].y + TANK_SIZE){
+                        this.playerSpeedX = 0;
+                    }
                 }
 
                 this.blocks.find(item => {
@@ -318,19 +363,30 @@ export function Model(){
 
     //столкновение пули, когда она летит влево
     this.checkCollisionBulletLeft = function(id){
-        if(this.bulletY + BULLET_SIZE >= this.enemiesPos.y && this.bulletY <= this.enemiesPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos.x && this.bulletX <= this.enemiesPos.x + TANK_SIZE){
-            this.explosion(19, this.soundExplosion2);
+        for(let i = 0; i < this.enemiesPos.length; i++){
+            if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                this.explosion(19, this.soundExplosion2);
 
-            cancelAnimationFrame(id);
+                this.enemiesPos.splice([i], 1);
 
-            //задержка, чтобы пули не вылетали сразу же после сталкивания
-            setTimeout(() => {
-                this.timer = true;
-                // this.bullet = false;
-            }, 2000);
+                this.enemies[i].delete(); //удаление танка
+                // console.log(this.enemies);
+                this.enemies.splice([i], 1);
 
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
+                // console.log(this.enemies);
+                this.countTanks--;
+
+                cancelAnimationFrame(id);
+
+
+                //задержка, чтобы пули не вылетали сразу же после сталкивания
+                setTimeout(() => {
+                    this.timer = true;
+                    this.bullet = false;
+                }, 500);
+
+                // добавить очки за убийство
+            }
         }
 
         this.blocks.find(item => {
@@ -399,19 +455,28 @@ export function Model(){
 
     //столкновение пули, когда она летит вправо
     this.checkCollisionBulletRight = function(id){
-        if(this.bulletY + BULLET_SIZE >= this.enemiesPos.y && this.bulletY <= this.enemiesPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos.x && this.bulletX <= this.enemiesPos.x + TANK_SIZE){
-            this.explosion(19, this.soundExplosion2);
+        for(let i = 0; i < this.enemiesPos.length; i++){
+            if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                this.explosion(19, this.soundExplosion2);
+                this.enemiesPos.splice([i], 1);
 
-            cancelAnimationFrame(id);
+                this.enemies[i].delete(); //удаление танка
+                this.enemies.splice([i], 1);
+                // console.log(this.enemies[i]);
+                this.countTanks--;
 
-            //задержка, чтобы пули не вылетали сразу же после сталкивания
-            setTimeout(() => {
-                this.timer = true;
-                this.bullet = false;
-            }, 2000);
+                cancelAnimationFrame(id);
 
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
+
+                //задержка, чтобы пули не вылетали сразу же после сталкивания
+                setTimeout(() => {
+                    this.timer = true;
+                    this.bullet = false;
+                }, 500);
+
+                // вызвать метод удаления танка, в который попали
+                // добавить очки за убийство
+            }
         }
 
         this.blocks.find(item => {
@@ -484,19 +549,29 @@ export function Model(){
 
     //столкновение пули, когда она летит вниз
     this.checkCollisionBulletDown = function(id){
-        if(this.bulletX + BULLET_SIZE >= this.enemiesPos.x && this.bulletX <= this.enemiesPos.x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.enemiesPos.y && this.bulletY + BULLET_SIZE <= this.enemiesPos.y + TANK_SIZE){
-            this.explosion(19, this.soundExplosion2);
+        for(let i = 0; i < this.enemiesPos.length; i++){
+            if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY + BULLET_SIZE <= this.enemiesPos[i].y + TANK_SIZE){
+                this.explosion(19, this.soundExplosion2);
+                this.enemiesPos.splice([i], 1);
 
-            cancelAnimationFrame(id);
+                this.enemies[i].delete(); //удаление танка
+                // console.log(this.enemies);
+                this.enemies.splice([i], 1);
+                // console.log(this.enemies);
+                this.countTanks--;
 
-            //задержка, чтобы пули не вылетали сразу же после сталкивания
-            setTimeout(() => {
-                this.timer = true;
-                this.bullet = false;
-            }, 2000);
+                cancelAnimationFrame(id);
 
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
+
+                //задержка, чтобы пули не вылетали сразу же после сталкивания
+                setTimeout(() => {
+                    this.timer = true;
+                    this.bullet = false;
+                }, 500);
+
+                // вызвать метод удаления танка, в который попали
+                // добавить очки за убийство
+            }
         }
 
         this.blocks.find(item => {
@@ -569,19 +644,29 @@ export function Model(){
 
     //столкновение пули, когда она летит вверх
     this.checkCollisionBulletUp = function(id){
-        if(this.bulletX + BULLET_SIZE >= this.enemiesPos.x && this.bulletX <= this.enemiesPos.x + TANK_SIZE && this.bulletY >= this.enemiesPos.y && this.bulletY <= this.enemiesPos.y + TANK_SIZE){
-            this.explosion(19, this.soundExplosion2);
+        for(let i = 0; i < this.enemiesPos.length; i++){
+            if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE){
+                this.explosion(19, this.soundExplosion2);
+                this.enemiesPos.splice([i], 1);
 
-            cancelAnimationFrame(id);
+                this.enemies[i].delete(); //удаление танка
+                // console.log(this.enemies);
+                this.enemies.splice([i], 1);
+                // console.log(this.enemies);
+                this.countTanks--;
 
-            //задержка, чтобы пули не вылетали сразу же после сталкивания
-            setTimeout(() => {
-                this.timer = true;
-                this.bullet = false;
-            }, 2000);
+                cancelAnimationFrame(id);
 
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
+
+                //задержка, чтобы пули не вылетали сразу же после сталкивания
+                setTimeout(() => {
+                    this.timer = true;
+                    this.bullet = false;
+                }, 500);
+
+                // вызвать метод удаления танка, в который попали
+                // добавить очки за убийство
+            }
         }
 
         this.blocks.find(item => {
@@ -735,9 +820,7 @@ export function Model(){
         myView.clearField();
         this.playerOneKeydown();
         this.field();
-        this.Enemies.getPlayerPos(this.playerX, this.playerY);
-        this.enemiesPos = this.Enemies.giveEnemiesPos();
-
+        // console.log(this.enemiesPos);
         requestAnimationFrame(this.loop);
     }
 }

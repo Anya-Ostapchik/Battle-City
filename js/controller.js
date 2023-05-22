@@ -25,7 +25,9 @@ export function Controller() {
         setTimeout(() => {
             myModel.getCanvas();
             myModel.gameStartOnePlayer();
-            myModel.drawEnemyTanks();
+            requestAnimationFrame(myModel.drawEnemyTanks);
+
+            // myModel.drawEnemyTanks();
         }, 100);
         
         addEventListener('keydown', function (e){

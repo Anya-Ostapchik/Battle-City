@@ -41,6 +41,12 @@ export function View(){
         }
     }
 
+    this.deleteTankIcon = function(){
+        const tanks = document.querySelector('.canvas__count-tank');
+
+        tanks.lastElementChild.remove();
+    }
+
     //отрисовка карты
     this.drawField = function(elem, x, y, w, h){
         ctx.drawImage(image, ...elem, x, y, w, h);

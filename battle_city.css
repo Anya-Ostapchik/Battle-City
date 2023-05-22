@@ -173,16 +173,18 @@ li:hover:before{
     display: inline-block;
 }
 .canvas__info {
-    display: inline-block;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     color: #000;
     font-size: 30px;
 }
 .canvas__count-tank {
     display: grid;
     grid-template: 1fr / 1fr 1fr;
-    margin-bottom: 50px;
+    /* margin-bottom: 50px; */
 }
 .canvas__new_tank{
     display: inline-block;
