@@ -41,6 +41,31 @@ export function View(){
         }
     }
 
+    // this.drawPlayerInfo = function(num, level){
+    //     const info = document.querySelector('.canvas__players');
+
+    //     const player = document.createElement('p');
+    //     player.textContent = `I P`;
+    //     player.classList.add('canvas__player');
+    //     const lives = document.createElement('p');
+    //     lives.textContent = num;
+    //     lives.classList.add('canvas__num_lives');
+    //     const stage = document.createElement('p');
+    //     stage.textContent = level;
+    //     stage.classList.add('canvas__stage');
+
+    //     info.append(player, lives, stage);
+    // }
+    this.changeNumLives = function(num){
+        const lives = document.querySelector('.canvas__num_lives');
+        lives.textContent = num;
+    }
+
+    this.changeNumStage = function(num){
+        const stage = document.querySelector('.canvas__stage');
+        stage.textContent = num;
+    }
+
     this.deleteTankIcon = function(){
         const tanks = document.querySelector('.canvas__count-tank');
 

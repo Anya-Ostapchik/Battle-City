@@ -16,7 +16,7 @@ export function Enemies(){
     this.bulletDirection = null;
     this.model = new Model();
     this.playerPos = [];
-    this.pos = {};
+    // this.pos = {};
     this.anim = null;
 
     this.init = (view, x, y, myLevel, arrBlocks) => {
@@ -42,8 +42,6 @@ export function Enemies(){
     this.getPlayerPos = function(x, y){
         this.playerPos[0] = x;
         this.playerPos[1] = y;
-        
-        // console.log(this.playerPos);
     }
 
     this.getRandomDirection = function(){
@@ -79,14 +77,13 @@ export function Enemies(){
     }
 
     this.drawAndCollision = function(){
-        this.getPlayerPos();
         switch (this.direction) {
             case 26: //up
                 //столкновение с игроком
-                if(this.posX + TANK_SIZE >= this.playerPos.x && this.posX <= this.playerPos.x + TANK_SIZE && this.posY <= this.playerPos.y + TANK_SIZE && this.posY >= this.playerPos.y){
+                if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX <= this.playerPos[0] + TANK_SIZE && this.posY <= this.playerPos[1] + TANK_SIZE && this.posY >= this.playerPos[1]){
                     this.speedY =- this.speedY;
-                    this.posY = this.playerPos.y + TANK_SIZE ;
-                    this.getRandomDirection();
+                    this.posY = this.playerPos[1] + TANK_SIZE;
+                    this.direction = 28;
                 }
 
                 //столкновение с блоками
@@ -108,10 +105,10 @@ export function Enemies(){
         
             case 28: //down
                 //столкновение с игроком
-                if(this.posX + TANK_SIZE >= this.playerPos.x && this.posX <= this.playerPos.x + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos.y && this.posY + TANK_SIZE <= this.playerPos.y + TANK_SIZE){
+                if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX <= this.playerPos[0] + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY + TANK_SIZE <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
-                    this.posY = this.playerPos.y - TANK_SIZE;
-                    this.getRandomDirection();
+                    this.posY = this.playerPos[1] - TANK_SIZE;
+                    this.direction = 26;
                 }
 
                 //столкновение с блоками
@@ -140,10 +137,10 @@ export function Enemies(){
         
             case 29: //left
                 //столкновение с игроком
-                if(this.posX <= this.playerPos.x + TANK_SIZE && this.posX >= this.playerPos.x && this.posY + TANK_SIZE >= this.playerPos.y && this.posY <= this.playerPos.y + TANK_SIZE){
+                if(this.posX <= this.playerPos[0] + TANK_SIZE && this.posX >= this.playerPos[0] && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
-                    this.posX = this.playerPos.x + TANK_SIZE;
-                    this.getRandomDirection();
+                    this.posX = this.playerPos[0] + TANK_SIZE;
+                    this.direction = 27;
                 }
 
                 //столкновение с блоками
@@ -172,10 +169,10 @@ export function Enemies(){
         
             case 27: //right
                 //столкновение с игроком
-                if(this.posX + TANK_SIZE >= this.playerPos.x && this.posX + TANK_SIZE <= this.playerPos.x + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos.y && this.posY <= this.playerPos.y + TANK_SIZE){
+                if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX + TANK_SIZE <= this.playerPos[0] + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
-                    this.posX = this.playerPos.x - TANK_SIZE;
-                    this.getRandomDirection();
+                    this.posX = this.playerPos[0] - TANK_SIZE;
+                    this.direction = 29;
                 }
 
                 //столкновение с блоками
@@ -269,20 +266,21 @@ export function Enemies(){
 
     //столкновение пули, когда она летит влево
     this.checkCollisionBulletLeft = function(id){
-        // if(this.bulletY + BULLET_SIZE >= this.playerPos.y && this.bulletY <= this.playerPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos.x && this.bulletX <= this.playerPos.x + TANK_SIZE){
-        //     this.explosion(19);
+        if(this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE){
+            this.model.revivalPlayer();
+            this.explosion(19);
 
-        //     cancelAnimationFrame(id);
+            cancelAnimationFrame(id);
 
-        //     //задержка, чтобы пули не вылетали сразу же после сталкивания
-        //     setTimeout(() => {
-        //         this.timer = true;
-        //         this.bullet = false;
-        //     }, 2000);
+            //задержка, чтобы пули не вылетали сразу же после сталкивания
+            setTimeout(() => {
+                this.timer = true;
+                this.bullet = false;
+            }, 2000);
 
-        //     //вызвать из модели метод перерождения танка
-        //     //вызвать из модели переменную с количеством жизни у танка
-        // }
+            //вызвать из модели метод перерождения танка
+            //вызвать из модели переменную с количеством жизни у танка
+        }
 
         this.blocks.find(item => {
             if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
@@ -345,20 +343,21 @@ export function Enemies(){
 
     //столкновение пули, когда она летит вправо
     this.checkCollisionBulletRight = function(id){
-        // if(this.bulletY + BULLET_SIZE >= this.playerPos.y && this.bulletY <= this.playerPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos.x && this.bulletX <= this.playerPos.x + TANK_SIZE){
-        //     this.explosion(19);
+        if(this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE){
+            this.model.revivalPlayer();
+            this.explosion(19);
 
-        //     cancelAnimationFrame(id);
+            cancelAnimationFrame(id);
 
-        //     //задержка, чтобы пули не вылетали сразу же после сталкивания
-        //     setTimeout(() => {
-        //         this.timer = true;
-        //         this.bullet = false;
-        //     }, 2000);
+            //задержка, чтобы пули не вылетали сразу же после сталкивания
+            setTimeout(() => {
+                this.timer = true;
+                this.bullet = false;
+            }, 2000);
 
-        //     //вызвать из модели метод перерождения танка
-        //     //вызвать из модели переменную с количеством жизни у танка
-        // }
+            //вызвать из модели метод перерождения танка
+            //вызвать из модели переменную с количеством жизни у танка
+        }
 
         this.blocks.find(item => {
             if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
@@ -427,20 +426,21 @@ export function Enemies(){
 
     //столкновение пули, когда она летит вниз
     this.checkCollisionBulletDown = function(id){
-        // if(this.bulletX + BULLET_SIZE >= this.playerPos.x && this.bulletX <= this.playerPos.x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.playerPos.y && this.bulletY + BULLET_SIZE <= this.playerPos.y + TANK_SIZE){
-        //     this.explosion(19);
+        if(this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY + BULLET_SIZE <= this.playerPos[1] + TANK_SIZE){
+            this.model.revivalPlayer();
+            this.explosion(19);
 
-        //     cancelAnimationFrame(id);
+            cancelAnimationFrame(id);
 
-        //     //задержка, чтобы пули не вылетали сразу же после сталкивания
-        //     setTimeout(() => {
-        //         this.timer = true;
-        //         this.bullet = false;
-        //     }, 2000);
+            //задержка, чтобы пули не вылетали сразу же после сталкивания
+            setTimeout(() => {
+                this.timer = true;
+                this.bullet = false;
+            }, 2000);
 
-        //     //вызвать из модели метод перерождения танка
-        //     //вызвать из модели переменную с количеством жизни у танка
-        // }
+            //вызвать из модели метод перерождения танка
+            //вызвать из модели переменную с количеством жизни у танка
+        }
 
         this.blocks.find(item => {
             if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
@@ -509,20 +509,21 @@ export function Enemies(){
 
     //столкновение пули, когда она летит вверх
     this.checkCollisionBulletUp = function(id){
-        // if(this.bulletX + BULLET_SIZE >= this.playerPos.x && this.bulletX <= this.playerPos.x + TANK_SIZE && this.bulletY >= this.playerPos.y && this.bulletY <= this.playerPos.y + TANK_SIZE){
-        //     this.explosion(19);
+        if(this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE && this.bulletY >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE){
+            this.model.revivalPlayer();
+            this.explosion(19);
 
-        //     cancelAnimationFrame(id);
+            cancelAnimationFrame(id);
 
-        //     //задержка, чтобы пули не вылетали сразу же после сталкивания
-        //     setTimeout(() => {
-        //         this.timer = true;
-        //         this.bullet = false;
-        //     }, 2000);
+            //задержка, чтобы пули не вылетали сразу же после сталкивания
+            setTimeout(() => {
+                this.timer = true;
+                this.bullet = false;
+            }, 2000);
 
-        //     //вызвать из модели метод перерождения танка
-        //     //вызвать из модели переменную с количеством жизни у танка
-        // }
+            //вызвать из модели метод перерождения танка
+            //вызвать из модели переменную с количеством жизни у танка
+        }
 
         this.blocks.find(item => {
             if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
@@ -660,9 +661,12 @@ export function Enemies(){
     // }
 
     this.loop = () => {
+        // this.getPlayerPos();
         this.setSpeed();
         this.drawAndCollision();
         this.setPosBullet();
+
+        // console.log(this.playerX);
 
         this.anim = requestAnimationFrame(this.loop);
     }

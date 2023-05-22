@@ -5,13 +5,13 @@ import { Enemies } from "./enemies.js";
 
 
 export function Model(){
-    let myView = null;
-    this.key = 'ArrowUp';
-    this.level = 1;
-    this.i = 15;
+    this.key = 'ArrowUp'; //направление танка
+    this.level = 1; //номер уровня
+    this.numLives = 2; //количество жизней
+    this.i = 15; //счетчик для взрыва
     this.countStar = 0;
-    this.bulletY = 0;
-    this.bulletX = 0;
+    this.bulletY = 0; //позиция пули по Y
+    this.bulletX = 0; //позиция пули по X
     this.timer = true;
     this.blocks = [];
     this.bullet = false;
@@ -30,15 +30,16 @@ export function Model(){
     this.game = false;
     this.Enemies = null;
     this.countTanks = 0; //количество танков на поле
-    this.k = 1;
+    this.k = 1; //счетчик для позиции врагов
     this.enemiesPosY = 0;
-    this.enemiesPos = [];
+    this.enemiesPos = []; //массив для хранения позиций всех танков врагов
     this.allEnemiesTanks = 0; //количество всех созданных танков
     this.enemies = []; //массив с врагами, которые сейчас на поле
+    this.dt = 0; //счетчик для количества убитых танков
     
     this.init = function(view){
-        myView = view;
-        this.Enemies = new Enemies();
+        this.myView = view;
+        
         this.soundStageStart = new Audio('sound/sound_stage_start.ogg');
         this.soundShoot = new Audio('sound/sound_bullet_shot.ogg');
         this.soundBulletHit1 = new Audio('sound/sound_bullet_hit_1.ogg');
@@ -51,19 +52,17 @@ export function Model(){
         this.soundMotor = new Audio('sound/sound_motor.ogg');
         this.soundMotor.loop = true;
         this.soundMotor.volume = 0.2;
-
-        this.getElemsMap();
     }
 
     this.getCanvas = function () {
-        myView.getCanvas();
+        this.myView.getCanvas();
     }
     
     this.field = function(){
         for(let i = 0; i < this.blocks.length; i++){
-            myView.drawField(spriteMap[this.blocks[i].material], this.blocks[i].x, this.blocks[i].y, this.blocks[i].width, this.blocks[i].height);
+            this.myView.drawField(spriteMap[this.blocks[i].material], this.blocks[i].x, this.blocks[i].y, this.blocks[i].width, this.blocks[i].height);
         }
-        myView.drawEagle(this.eagleState);
+        this.myView.drawEagle(this.eagleState);
     }
 
     this.getElemsMap = function(){
@@ -77,18 +76,18 @@ export function Model(){
     }
 
     this.gameStartOnePlayer = function(){
+        this.getElemsMap();
         this.start();
-        myView.drawRemainingTanks();
+        this.myView.drawRemainingTanks();
+        this.Enemies = new Enemies();
+        requestAnimationFrame(this.drawEnemyTanks);
     }
 
     this.drawEnemyTanks = () => {
         const animId = requestAnimationFrame(this.drawEnemyTanks);
 
-        if(this.allEnemiesTanks >= 20){
+        if(this.allEnemiesTanks >= 4){
             cancelAnimationFrame(animId);
-
-            // this.showScore();
-            // this.nextLevel();
         }
 
         if(this.countTanks < 4){
@@ -105,17 +104,42 @@ export function Model(){
 
             this.enemies.push(new Enemies());
 
-            this.enemies[this.countTanks].init(myView, this.enemiesPosX, this.enemiesPosY, this.level, this.blocks);
+            this.enemies[this.countTanks].init(this.myView, this.enemiesPosX, this.enemiesPosY, this.level, this.blocks);
 
-            myView.deleteTankIcon();
+            this.myView.deleteTankIcon();
 
-            this.countTanks++;
             this.allEnemiesTanks++;
+            this.countTanks++;
+        }
+    }
+
+    this.getEnemisPos = function(){
+        for (let i = 0; i < this.countTanks; i++) {
+            this.enemiesPos[i] = this.enemies[i].giveEnemiesPos();
+            this.enemies[i].getPlayerPos(this.playerX, this.playerY);
+        }
+    }
+
+    this.nextLevel = function(){
+        this.level++;
+        this.myView.changeNumLives(this.level);
+        // this.myView.clearField();
+        this.gameStartOnePlayer();
+    }
+    
+    this.revivalPlayer = function(){
+        this.numLives--;
+
+        console.log(this.numLives);
+        if(this.numLives === 0){
+            this.gameOver();
         }
 
-        for (let i = 0; i < this.countTanks; i++) {
-            this.enemiesPos[i] = this.enemies[i].giveEnemiesPos();;
-        }
+
+        // this.myView.changeNumLives(this.numLives);
+
+        this.playerX = 9 * BLOCK_WIDTH;
+        this.playerY = CANVAS_HEIGHT - TANK_SIZE;
     }
 
     this.checkCollisionTank = function(){
@@ -229,7 +253,7 @@ export function Model(){
                     
                     this.playerY += this.playerSpeedY;
 
-                    myView.drawPlayerOne(7, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(7, this.playerX, this.playerY);
                     break;
                 case 'ArrowDown':
                     this.playerSpeedY = 2;
@@ -239,7 +263,7 @@ export function Model(){
 
                     this.playerY += this.playerSpeedY;
 
-                    myView.drawPlayerOne(9, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(9, this.playerX, this.playerY);
                     break;
                 case 'ArrowLeft':
                     this.playerSpeedX = -2;
@@ -249,7 +273,7 @@ export function Model(){
 
                     this.playerX += this.playerSpeedX;
 
-                    myView.drawPlayerOne(10, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(10, this.playerX, this.playerY);
                     break;
                 case 'ArrowRight':
                     this.playerSpeedX = 2;
@@ -259,7 +283,7 @@ export function Model(){
 
                     this.playerX += this.playerSpeedX;
 
-                    myView.drawPlayerOne(8, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(8, this.playerX, this.playerY);
                     break;
                 default:
                     break;
@@ -271,19 +295,19 @@ export function Model(){
             switch (this.key) {
                 case 'ArrowUp':
                     this.playerSpeedY = 0;
-                    myView.drawPlayerOne(7, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(7, this.playerX, this.playerY);
                     break;
                 case 'ArrowDown':
                     this.playerSpeedY = 0;
-                    myView.drawPlayerOne(9, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(9, this.playerX, this.playerY);
                     break;
                 case 'ArrowLeft':
                     this.playerSpeedX = 0;
-                    myView.drawPlayerOne(10, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(10, this.playerX, this.playerY);
                     break;
                 case 'ArrowRight':
                     this.playerSpeedX = 0;
-                    myView.drawPlayerOne(8, this.playerX, this.playerY);
+                    this.myView.drawPlayerOne(8, this.playerX, this.playerY);
                     break;
                 default:
                     break;
@@ -297,30 +321,30 @@ export function Model(){
         switch (this.key) {
             case 'ArrowUp':
                 if(this.i < 18){
-                    myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE, EXPLOSION_SIZE);
+                    this.myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE, EXPLOSION_SIZE);
                 } else{
-                    myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
+                    this.myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
                 }
                 break;
             case 'ArrowLeft':
                 if(this.i < 18){
-                    myView.drawExplosion(this.i, this.bulletX - BLOCK_WIDTH / 4, this.bulletY - BULLET_SIZE, EXPLOSION_SIZE, EXPLOSION_SIZE);
+                    this.myView.drawExplosion(this.i, this.bulletX - BLOCK_WIDTH / 4, this.bulletY - BULLET_SIZE, EXPLOSION_SIZE, EXPLOSION_SIZE);
                 } else{
-                    myView.drawExplosion(this.i, this.bulletX - BLOCK_WIDTH / 4, this.bulletY - BULLET_SIZE, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
+                    this.myView.drawExplosion(this.i, this.bulletX - BLOCK_WIDTH / 4, this.bulletY - BULLET_SIZE, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
                 }
                 break;
             case 'ArrowDown':
                 if(this.i < 18){
-                    myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE / 2, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE, EXPLOSION_SIZE);
+                    this.myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE / 2, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE, EXPLOSION_SIZE);
                 } else{
-                    myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE / 2, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
+                    this.myView.drawExplosion(this.i, this.bulletX - BULLET_SIZE / 2, this.bulletY - BLOCK_WIDTH / 4, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
                 }
                 break;
             case 'ArrowRight':
                 if(this.i < 18){
-                    myView.drawExplosion(this.i, this.bulletX + BLOCK_WIDTH / 4, this.bulletY - BLOCK_WIDTH / 2, EXPLOSION_SIZE, EXPLOSION_SIZE);
+                    this.myView.drawExplosion(this.i, this.bulletX + BLOCK_WIDTH / 4, this.bulletY - BLOCK_WIDTH / 2, EXPLOSION_SIZE, EXPLOSION_SIZE);
                 } else{
-                    myView.drawExplosion(this.i, this.bulletX + BLOCK_WIDTH / 4, this.bulletY - BLOCK_WIDTH / 2, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
+                    this.myView.drawExplosion(this.i, this.bulletX + BLOCK_WIDTH / 4, this.bulletY - BLOCK_WIDTH / 2, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
                 }
                 break;
             default:
@@ -365,6 +389,7 @@ export function Model(){
     this.checkCollisionBulletLeft = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                this.dt++;
                 this.explosion(19, this.soundExplosion2);
 
                 this.enemiesPos.splice([i], 1);
@@ -457,6 +482,7 @@ export function Model(){
     this.checkCollisionBulletRight = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                this.dt++;
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
@@ -551,6 +577,7 @@ export function Model(){
     this.checkCollisionBulletDown = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY + BULLET_SIZE <= this.enemiesPos[i].y + TANK_SIZE){
+                this.dt++;
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
@@ -646,6 +673,7 @@ export function Model(){
     this.checkCollisionBulletUp = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE){
+                this.dt++;
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
@@ -744,7 +772,7 @@ export function Model(){
         this.bulletY += this.speedBylletY;
         this.bulletX += this.speedBylletX;
 
-        myView.drawBullet(this.bulletDirection, this.bulletX, this.bulletY);
+        this.myView.drawBullet(this.bulletDirection, this.bulletX, this.bulletY);
     }
 
     this.playerOneShiftKeydown = () => {
@@ -800,16 +828,18 @@ export function Model(){
         }
     }
     
-    this.gameOver = function(){
+    this.gameOver = () => {
+        // console.log(this.soundMotor);
         this.soundMotor.pause();
         this.soundMovement.pause();
         this.game = true;
         
         this.soundGameOver.play();
+        this.myView.gameOver();
 
-        setTimeout(() => {
-            myView.gameOver();
-        }, 1000);
+        // setTimeout(() => {
+            
+        // }, 1000);
     }
 
     this.start = function(){
@@ -817,10 +847,21 @@ export function Model(){
     }
 
     this.loop = () => {
-        myView.clearField();
+        this.myView.clearField();
         this.playerOneKeydown();
         this.field();
-        // console.log(this.enemiesPos);
-        requestAnimationFrame(this.loop);
+        this.getEnemisPos();
+        const mainAnimId = requestAnimationFrame(this.loop);
+
+        if(this.dt === 4){
+            cancelAnimationFrame(mainAnimId);
+            this.blocks = [];
+            this.enemiesPos = [];
+            this.dt = 0;
+            this.allEnemiesTanks = 0;
+            this.countTanks = 0;
+            // this.showScore();
+            this.nextLevel();
+        }
     }
 }
