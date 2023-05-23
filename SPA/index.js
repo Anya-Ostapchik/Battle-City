@@ -3,7 +3,6 @@ import Statistics from "./Pages/Statistics.js";
 import Rules from "./Pages/Rules.js";
 import Level from "./Pages/Level.js";
 import Game from "./Pages/Game.js";
-// import Scoring from "./Pages/Scoring.js";
 import ErrorPage from "./Pages/ErrorPage.js";
 
 const components = {
@@ -16,7 +15,6 @@ const routes = {
   rules: Rules,
   level: Level,
   game: Game,
-  // scoring: Scoring,
   default: HomePage,
   error: ErrorPage,
 };

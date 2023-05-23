@@ -16,23 +16,22 @@ export function Enemies(){
     this.bulletDirection = null;
     this.model = new Model();
     this.playerPos = [];
-    // this.pos = {};
     this.anim = null;
 
-    this.init = (view, x, y, myLevel, arrBlocks) => {
+    this.init = (view, x, y, myLevel, arrBlocks, allTanks) => {
         this.viewGame = view;
         this.posX = x;
         this.posY = y;
         level = myLevel;
         this.blocks = arrBlocks;
-
+        this.allTanks = allTanks;
         this.getRandomDirection();
 
         requestAnimationFrame(this.loop);
     }
 
     this.giveEnemiesPos = function(){
-        return {x: this.posX, y: this.posY};
+        return {x: this.posX, y: this.posY, d: this.direction, bx: this.bulletX, by: this.bulletY, redTank: this.tankRed};
     }
 
     this.delete = function(){
@@ -45,9 +44,19 @@ export function Enemies(){
     }
 
     this.getRandomDirection = function(){
-        for(let i = 0; i <= this.allEnemyTanks; i++){
-            if(levels[level - 1].enemies[i] === 0){
+        if(this.allTanks === 4 || this.allTanks === 11 || this.allTanks === 18){
+            this.tankRed = true;
+            if(levels[level - 1].enemies[this.allTanks - 1] === 0){
+                this.direction = Math.floor(Math.random() * (33 - 30 + 1)) + 30;
+            } else if(levels[level - 1].enemies[this.allTanks - 1] === 1){
+                this.direction = Math.floor(Math.random() * (41 - 38 + 1)) + 38;
+            }
+        } else{
+            this.tankRed = false;
+            if(levels[level - 1].enemies[this.allTanks - 1] === 0){
                 this.direction = Math.floor(Math.random() * (29 - 26 + 1)) + 26;
+            } else if(levels[level - 1].enemies[this.allTanks - 1] === 1){
+                this.direction = Math.floor(Math.random() * (37 - 34 + 1)) + 34;
             }
         }
     }
@@ -55,20 +64,44 @@ export function Enemies(){
     this.setSpeed = function(){
         switch (this.direction) {
             case 26:
+            case 30:
                 this.speedY = -1;
                 this.speedX = 0;
                 break;
+            case 34:
+            case 38:
+                this.speedY = -2;
+                this.speedX = 0;
+                break;
             case 27:
+            case 31:
                 this.speedY = 0;
                 this.speedX = 1;
                 break;
+            case 35:
+            case 39:
+                this.speedY = 0;
+                this.speedX = 2;
+                break;
             case 28:
+            case 32:
                 this.speedY = 1;
                 this.speedX = 0;
                 break;
+            case 36:
+            case 40:
+                this.speedY = 2;
+                this.speedX = 0;
+                break;
             case 29:
+            case 33:
                 this.speedY = 0;
                 this.speedX = -1;
+                break;
+            case 37:
+            case 41:
+                this.speedY = 0;
+                this.speedX = -2;
                 break;
         
             default:
@@ -78,7 +111,10 @@ export function Enemies(){
 
     this.drawAndCollision = function(){
         switch (this.direction) {
-            case 26: //up
+            case 26:
+            case 30:
+            case 34:
+            case 38:
                 //столкновение с игроком
                 if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX <= this.playerPos[0] + TANK_SIZE && this.posY <= this.playerPos[1] + TANK_SIZE && this.posY >= this.playerPos[1]){
                     this.speedY =- this.speedY;
@@ -88,7 +124,7 @@ export function Enemies(){
 
                 //столкновение с блоками
                 this.blocks.find(item => {
-                    if(this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR && this.posY >= item.y + MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR && this.posY >= item.y + MEASUREMENT_ERROR){
                         this.speedY =- this.speedY;
                         this.posY = item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR;
                         this.getRandomDirection();
@@ -103,7 +139,10 @@ export function Enemies(){
                 }
                 break;
         
-            case 28: //down
+            case 28:
+            case 32:
+            case 36:
+            case 40:
                 //столкновение с игроком
                 if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX <= this.playerPos[0] + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY + TANK_SIZE <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
@@ -113,7 +152,7 @@ export function Enemies(){
 
                 //столкновение с блоками
                 this.blocks.find(item => {
-                    if(this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY + TANK_SIZE <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY + TANK_SIZE <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.speedY =- this.speedY;
                         this.posY = item.y - TANK_SIZE + MEASUREMENT_ERROR;
                         this.getRandomDirection();
@@ -135,7 +174,10 @@ export function Enemies(){
                 }
                 break;
         
-            case 29: //left
+            case 29:
+            case 33:
+            case 37:
+            case 41:
                 //столкновение с игроком
                 if(this.posX <= this.playerPos[0] + TANK_SIZE && this.posX >= this.playerPos[0] && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
@@ -145,7 +187,7 @@ export function Enemies(){
 
                 //столкновение с блоками
                 this.blocks.find(item => {
-                    if(this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posX >= item.x + MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.posX <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posX >= item.x + MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.speedX =- this.speedX;
                         this.posX = item.x + BLOCK_WIDTH - MEASUREMENT_ERROR;
                         this.getRandomDirection();
@@ -167,7 +209,10 @@ export function Enemies(){
                 }
                 break;
         
-            case 27: //right
+            case 27:
+            case 31:
+            case 35:
+            case 39:
                 //столкновение с игроком
                 if(this.posX + TANK_SIZE >= this.playerPos[0] && this.posX + TANK_SIZE <= this.playerPos[0] + TANK_SIZE && this.posY + TANK_SIZE >= this.playerPos[1] && this.posY <= this.playerPos[1] + TANK_SIZE){
                     this.speedY =- this.speedY;
@@ -177,7 +222,7 @@ export function Enemies(){
 
                 //столкновение с блоками
                 this.blocks.find(item => {
-                    if(this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX + TANK_SIZE <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.posX + TANK_SIZE >= item.x + MEASUREMENT_ERROR && this.posX + TANK_SIZE <= item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.posY + TANK_SIZE >= item.y + MEASUREMENT_ERROR && this.posY <= item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.speedX =- this.speedX;
                         this.posX = item.x - TANK_SIZE + MEASUREMENT_ERROR;
                         this.getRandomDirection();
@@ -267,9 +312,7 @@ export function Enemies(){
     //столкновение пули, когда она летит влево
     this.checkCollisionBulletLeft = function(id){
         if(this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE){
-            this.model.revivalPlayer();
             this.explosion(19);
-
             cancelAnimationFrame(id);
 
             //задержка, чтобы пули не вылетали сразу же после сталкивания
@@ -277,13 +320,10 @@ export function Enemies(){
                 this.timer = true;
                 this.bullet = false;
             }, 2000);
-
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
         }
 
         this.blocks.find(item => {
-            if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+            if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
 
                 cancelAnimationFrame(id);
 
@@ -323,14 +363,12 @@ export function Enemies(){
             this.explosion(19);
 
             cancelAnimationFrame(id);
+            
             this.eagleState = 21;
-            this.gameOver();
         }
       
         //столкновение с границами карты
         if(this.bulletX <= 0){
-            // this.explosion(17);
-
             cancelAnimationFrame(id);
 
             //задержка, чтобы пули не вылетали сразу же после сталкивания
@@ -344,7 +382,6 @@ export function Enemies(){
     //столкновение пули, когда она летит вправо
     this.checkCollisionBulletRight = function(id){
         if(this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE){
-            this.model.revivalPlayer();
             this.explosion(19);
 
             cancelAnimationFrame(id);
@@ -354,13 +391,10 @@ export function Enemies(){
                 this.timer = true;
                 this.bullet = false;
             }, 2000);
-
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
         }
 
         this.blocks.find(item => {
-            if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+            if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
 
                 cancelAnimationFrame(id);
 
@@ -407,13 +441,10 @@ export function Enemies(){
 
             cancelAnimationFrame(id);
             this.eagleState = 21;
-            this.gameOver();
         }
         
         //столкновение с границами карты
         if(this.bulletX > CANVAS_WIDTH - BULLET_SIZE){
-            // this.explosion(17);
-
             cancelAnimationFrame(id);
 
             //задержка, чтобы пули не вылетали сразу же после сталкивания
@@ -427,7 +458,6 @@ export function Enemies(){
     //столкновение пули, когда она летит вниз
     this.checkCollisionBulletDown = function(id){
         if(this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.playerPos[1] && this.bulletY + BULLET_SIZE <= this.playerPos[1] + TANK_SIZE){
-            this.model.revivalPlayer();
             this.explosion(19);
 
             cancelAnimationFrame(id);
@@ -437,13 +467,11 @@ export function Enemies(){
                 this.timer = true;
                 this.bullet = false;
             }, 2000);
-
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
         }
 
         this.blocks.find(item => {
-            if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
+            console.log(item.material);
+            if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
 
                 cancelAnimationFrame(id);
 
@@ -490,13 +518,10 @@ export function Enemies(){
 
             cancelAnimationFrame(id);
             this.eagleState = 21;
-            this.gameOver();
         }
 
         //столкновение с границами карты
         if(this.bulletY > CANVAS_HEIGHT - BULLET_SIZE){
-            // this.explosion(17);
-
             cancelAnimationFrame(id);
 
             //задержка, чтобы пули не вылетали сразу же после сталкивания
@@ -510,7 +535,6 @@ export function Enemies(){
     //столкновение пули, когда она летит вверх
     this.checkCollisionBulletUp = function(id){
         if(this.bulletX + BULLET_SIZE >= this.playerPos[0] && this.bulletX <= this.playerPos[0] + TANK_SIZE && this.bulletY >= this.playerPos[1] && this.bulletY <= this.playerPos[1] + TANK_SIZE){
-            this.model.revivalPlayer();
             this.explosion(19);
 
             cancelAnimationFrame(id);
@@ -520,13 +544,10 @@ export function Enemies(){
                 this.timer = true;
                 this.bullet = false;
             }, 2000);
-
-            //вызвать из модели метод перерождения танка
-            //вызвать из модели переменную с количеством жизни у танка
         }
 
         this.blocks.find(item => {
-            if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
+            if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
 
                 cancelAnimationFrame(id);
 
@@ -560,8 +581,6 @@ export function Enemies(){
 
         //столкновение с границами карты
         if(this.bulletY <= 0){
-            // this.explosion(17);
-
             cancelAnimationFrame(id);
 
             //задержка, чтобы пули не вылетали сразу же после сталкивания
@@ -605,6 +624,9 @@ export function Enemies(){
             this.bullet = true;
             switch (this.direction) {
                 case 26:
+                case 30:
+                case 34:
+                case 38:
                     this.bulletX = this.posX + TANK_SIZE / 2 - BULLET_SIZE / 2;
                     this.bulletY = this.posY;
                 
@@ -614,6 +636,9 @@ export function Enemies(){
                     this.bulletDirection = 11;
                 break;
                 case 28:
+                case 32:
+                case 36:
+                case 40:
                     this.bulletX = this.posX + TANK_SIZE / 2 - BULLET_SIZE / 2;
                     this.bulletY = this.posY + TANK_SIZE - BULLET_SIZE;
 
@@ -623,6 +648,9 @@ export function Enemies(){
                     this.bulletDirection = 13;
                 break;
                 case 29:
+                case 33:
+                case 37:
+                case 41:
                     this.bulletX = this.posX;
                     this.bulletY = this.posY + TANK_SIZE / 2 - BULLET_SIZE / 2;
 
@@ -632,6 +660,9 @@ export function Enemies(){
                     this.bulletDirection = 14;
                     break;
                 case 27:
+                case 31:
+                case 35:
+                case 39:
                     this.bulletX = this.posX + TANK_SIZE - BULLET_SIZE;
                     this.bulletY = this.posY + TANK_SIZE / 2 - BULLET_SIZE / 2;
 
@@ -647,26 +678,11 @@ export function Enemies(){
             requestAnimationFrame(this.bulletMovement);
         }
     }
-    
-    // this.gameOver = function(){
-    //     // this.soundMotor.pause();
-    //     // this.soundMovement.pause();
-    //     this.game = true;
-        
-    //     // this.soundGameOver.play();
-
-    //     setTimeout(() => {
-    //         this.viewGame.gameOver();
-    //     }, 1000);
-    // }
 
     this.loop = () => {
-        // this.getPlayerPos();
         this.setSpeed();
         this.drawAndCollision();
         this.setPosBullet();
-
-        // console.log(this.playerX);
 
         this.anim = requestAnimationFrame(this.loop);
     }

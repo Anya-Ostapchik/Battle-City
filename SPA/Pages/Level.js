@@ -1,5 +1,4 @@
 const Level = {
-    id: "level",
     title: "Game",
     render: () => {
       return `

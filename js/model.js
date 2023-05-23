@@ -1,6 +1,6 @@
 import { levels } from "./levels.js";
 import { spriteMap } from "./sprite-map.js";
-import { BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_HEIGHT, CANVAS_WIDTH, BULLET_SIZE, EXPLOSION_SIZE, EAGLE_SIZE, TANK_SIZE, MEASUREMENT_ERROR} from "./constants.js";
+import { BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_HEIGHT, CANVAS_WIDTH, BULLET_SIZE, EXPLOSION_SIZE, EAGLE_SIZE, TANK_SIZE, MEASUREMENT_ERROR, BONUS_SIZE } from "./constants.js";
 import { Enemies } from "./enemies.js";
 
 
@@ -22,8 +22,6 @@ export function Model(){
     this.eagleState = 20;
     this.playerSpeedX = 0;
     this.playerSpeedY = 0;
-    this.playerX = 9 * BLOCK_WIDTH;
-    this.playerY = CANVAS_HEIGHT - TANK_SIZE;
     this.isMoving = false;
     this.isShoots = false;
     this.animation = false;
@@ -36,10 +34,11 @@ export function Model(){
     this.allEnemiesTanks = 0; //количество всех созданных танков
     this.enemies = []; //массив с врагами, которые сейчас на поле
     this.dt = 0; //счетчик для количества убитых танков
+    this.score = 0;
     
     this.init = function(view){
         this.myView = view;
-        
+
         this.soundStageStart = new Audio('sound/sound_stage_start.ogg');
         this.soundShoot = new Audio('sound/sound_bullet_shot.ogg');
         this.soundBulletHit1 = new Audio('sound/sound_bullet_hit_1.ogg');
@@ -58,11 +57,13 @@ export function Model(){
         this.myView.getCanvas();
     }
     
-    this.field = function(){
+    this.field = () => {
         for(let i = 0; i < this.blocks.length; i++){
             this.myView.drawField(spriteMap[this.blocks[i].material], this.blocks[i].x, this.blocks[i].y, this.blocks[i].width, this.blocks[i].height);
         }
         this.myView.drawEagle(this.eagleState);
+
+        requestAnimationFrame(this.field);
     }
 
     this.getElemsMap = function(){
@@ -76,21 +77,31 @@ export function Model(){
     }
 
     this.gameStartOnePlayer = function(){
+        if(this.mainAnimId){
+            cancelAnimationFrame(this.mainAnimId);
+            this.blocks = [];
+            this.enemiesPos = [];
+            this.dt = 0;
+            this.allEnemiesTanks = 0;
+            this.countTanks = 0;
+            this.numLives = 2;
+        }
+
+        this.playerX = 9 * BLOCK_WIDTH;
+        this.playerY = CANVAS_HEIGHT - TANK_SIZE;
+
         this.getElemsMap();
-        this.start();
         this.myView.drawRemainingTanks();
-        this.Enemies = new Enemies();
+        this.start();
         requestAnimationFrame(this.drawEnemyTanks);
+        requestAnimationFrame(this.field);
     }
 
     this.drawEnemyTanks = () => {
-        const animId = requestAnimationFrame(this.drawEnemyTanks);
+        this.enemyAnimId = requestAnimationFrame(this.drawEnemyTanks);
+        requestAnimationFrame(this.checkCollisionBulletEnemies);
 
-        if(this.allEnemiesTanks >= 4){
-            cancelAnimationFrame(animId);
-        }
-
-        if(this.countTanks < 4){
+        if(this.countTanks <= 4){
             if(this.k === 1){
                 this.enemiesPosX = 0;
                 this.k++;
@@ -102,14 +113,19 @@ export function Model(){
                 this.k = 1;
             }
 
+            this.allEnemiesTanks++;
+
             this.enemies.push(new Enemies());
 
-            this.enemies[this.countTanks].init(this.myView, this.enemiesPosX, this.enemiesPosY, this.level, this.blocks);
+            this.enemies[this.countTanks].init(this.myView, this.enemiesPosX, this.enemiesPosY, this.level, this.blocks, this.allEnemiesTanks);
+
+            this.countTanks++;
 
             this.myView.deleteTankIcon();
+        }
 
-            this.allEnemiesTanks++;
-            this.countTanks++;
+        if(this.allEnemiesTanks >= 4){
+            cancelAnimationFrame(this.enemyAnimId);
         }
     }
 
@@ -121,22 +137,22 @@ export function Model(){
     }
 
     this.nextLevel = function(){
+        this.soundMotor.play();
+        this.soundMovement.play();
         this.level++;
         this.myView.changeNumLives(this.level);
-        // this.myView.clearField();
         this.gameStartOnePlayer();
     }
     
     this.revivalPlayer = function(){
         this.numLives--;
 
-        console.log(this.numLives);
-        if(this.numLives === 0){
+        if(this.numLives <= 0){
             this.gameOver();
         }
 
+        this.myView.changeNumLives(this.numLives);
 
-        // this.myView.changeNumLives(this.numLives);
 
         this.playerX = 9 * BLOCK_WIDTH;
         this.playerY = CANVAS_HEIGHT - TANK_SIZE;
@@ -152,7 +168,7 @@ export function Model(){
                 }
                 
                 this.blocks.find(item => {
-                    if(this.playerX + TANK_SIZE > item.x + MEASUREMENT_ERROR && this.playerX < item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY === item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.playerX + TANK_SIZE > item.x + MEASUREMENT_ERROR && this.playerX < item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY === item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.playerSpeedY = 0;
                     }
                 })
@@ -171,7 +187,7 @@ export function Model(){
                 }
 
                 this.blocks.find(item => {
-                    if(this.playerX + TANK_SIZE > item.x + MEASUREMENT_ERROR && this.playerX < item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY + TANK_SIZE === item.y + MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.playerX + TANK_SIZE > item.x + MEASUREMENT_ERROR && this.playerX < item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY + TANK_SIZE === item.y + MEASUREMENT_ERROR){
                         this.playerSpeedY = 0;
                     }
                 })
@@ -195,7 +211,7 @@ export function Model(){
                 }
 
                 this.blocks.find(item => {
-                    if(this.playerX === item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY + TANK_SIZE > item.y + MEASUREMENT_ERROR && this.playerY < item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.playerX === item.x + BLOCK_WIDTH - MEASUREMENT_ERROR && this.playerY + TANK_SIZE > item.y + MEASUREMENT_ERROR && this.playerY < item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.playerSpeedX = 0;
                     }
                 })
@@ -219,7 +235,7 @@ export function Model(){
                 }
 
                 this.blocks.find(item => {
-                    if(this.playerX + TANK_SIZE === item.x + MEASUREMENT_ERROR && this.playerY + TANK_SIZE > item.y + MEASUREMENT_ERROR && this.playerY < item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
+                    if(item.material !== 42 && this.playerX + TANK_SIZE === item.x + MEASUREMENT_ERROR && this.playerY + TANK_SIZE > item.y + MEASUREMENT_ERROR && this.playerY < item.y + BLOCK_HEIGHT - MEASUREMENT_ERROR){
                         this.playerSpeedX = 0;
                     }
                 })
@@ -237,6 +253,68 @@ export function Model(){
         
             default:
                 break;
+        }
+    }
+
+    this.checkCollisionBulletEnemies = ()=>{
+        const id = requestAnimationFrame(this.checkCollisionBulletEnemies);
+        for (let i = 0; i < this.enemiesPos.length; i++) {
+            switch (this.enemiesPos[i].d) {
+                case 26:
+                case 30:
+                case 34:
+                case 38:
+                    if(this.enemiesPos[i].bx + BULLET_SIZE >= this.playerX && this.enemiesPos[i].bx <= this.playerX + TANK_SIZE && this.enemiesPos[i].by >= this.playerY && this.enemiesPos[i].by <= this.playerY + TANK_SIZE){
+                        this.soundExplosion2.play();
+                        this.revivalPlayer();
+                    }
+                    break;
+                case 27:
+                case 31:
+                case 35:
+                case 39:
+                    if(this.enemiesPos[i].by + BULLET_SIZE >= this.playerY && this.enemiesPos[i].by <= this.playerY + TANK_SIZE && this.enemiesPos[i].bx + BULLET_SIZE >= this.playerX && this.enemiesPos[i].bx <= this.playerX + TANK_SIZE){
+                        this.soundExplosion2.play();
+                        this.revivalPlayer();
+                    }
+                    if(this.enemiesPos[i].by + BULLET_SIZE >= 24 * BLOCK_HEIGHT && this.enemiesPos[i].by <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.enemiesPos[i].bx + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.enemiesPos[i].bx <= 12 * BLOCK_WIDTH + EAGLE_SIZE){
+                        cancelAnimationFrame(id);
+                        this.gameOver();
+                        this.soundExplosion2.play();
+                    }
+                    break;
+                case 28:
+                case 32:
+                case 36:
+                case 40:
+                    if(this.enemiesPos[i].bx + BULLET_SIZE >= this.playerX && this.enemiesPos[i].bx <= this.playerX + TANK_SIZE && this.enemiesPos[i].by + BULLET_SIZE >= this.playerY && this.enemiesPos[i].by + BULLET_SIZE <= this.playerY + TANK_SIZE){
+                        this.soundExplosion2.play();
+                        this.revivalPlayer();
+                    }
+                    if(this.enemiesPos[i].bx + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.enemiesPos[i].bx <= 12 * BLOCK_WIDTH + EAGLE_SIZE && this.enemiesPos[i].by + BULLET_SIZE <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.enemiesPos[i].by + BULLET_SIZE >= 24 * BLOCK_HEIGHT){
+                        cancelAnimationFrame(id);
+                        this.gameOver();
+                        this.soundExplosion2.play();
+                    }
+                    break;
+                case 29:
+                case 33:
+                case 37:
+                case 41:
+                    if(this.enemiesPos[i].by + BULLET_SIZE >= this.playerY && this.enemiesPos[i].by <= this.playerY + TANK_SIZE && this.enemiesPos[i].bx + BULLET_SIZE >= this.playerX && this.enemiesPos[i].bx <= this.playerX + TANK_SIZE){
+                        this.soundExplosion2.play();
+                        this.revivalPlayer();
+                    }
+                    if(this.enemiesPos[i].by + BULLET_SIZE >= 24 * BLOCK_HEIGHT && this.enemiesPos[i].by <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.enemiesPos[i].bx + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.enemiesPos[i].bx <= 12 * BLOCK_WIDTH + EAGLE_SIZE){
+                        cancelAnimationFrame(id);
+                        this.gameOver();
+                        this.soundExplosion2.play();
+                    }
+                    break;
+            
+                default:
+                    break;
+            }
         }
     }
 
@@ -315,6 +393,15 @@ export function Model(){
         }
     }
 
+    this.showBonuses = function(){
+        this.posX = Math.floor(Math.random() * (CANVAS_WIDTH - BONUS_SIZE - 0 + 1)) + 0;
+        this.posY = Math.floor(Math.random() * (CANVAS_HEIGHT - BONUS_SIZE - 0 + 1)) + 0;
+
+        this.bonus = Math.floor(Math.random() * (73 - 69 + 1)) + 69;
+
+        this.myView.drawBonus(this.bonus, this.posX, this.posY);
+    }
+
     this.drawExplosion = () => {
         let animId = null;
         
@@ -381,7 +468,6 @@ export function Model(){
             }
         }, 100);
 
-        this.bullet = false;
         music.play();
     }
 
@@ -389,33 +475,34 @@ export function Model(){
     this.checkCollisionBulletLeft = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                if(this.enemiesPos[i].tankRed){
+                    this.showBonuses();
+                }
+
                 this.dt++;
                 this.explosion(19, this.soundExplosion2);
 
                 this.enemiesPos.splice([i], 1);
 
                 this.enemies[i].delete(); //удаление танка
-                // console.log(this.enemies);
                 this.enemies.splice([i], 1);
 
-                // console.log(this.enemies);
                 this.countTanks--;
 
-                cancelAnimationFrame(id);
+                this.score += 200;
 
+                cancelAnimationFrame(id);
 
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
                 }, 500);
-
-                // добавить очки за убийство
             }
         }
 
         this.blocks.find(item => {
-            if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+            if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
 
                 cancelAnimationFrame(id);
 
@@ -449,6 +536,7 @@ export function Model(){
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
+                    this.bullet = false;
                 }, 500);
             }
         })
@@ -473,6 +561,7 @@ export function Model(){
             //задержка, чтобы пули не вылетали сразу же после сталкивания
             setTimeout(() => {
                 this.timer = true;
+                this.bullet = false;
             }, 500);
 
         }
@@ -482,31 +571,31 @@ export function Model(){
     this.checkCollisionBulletRight = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE){
+                if(this.enemiesPos[i].tankRed){
+                    this.showBonuses();
+                }
                 this.dt++;
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
                 this.enemies[i].delete(); //удаление танка
                 this.enemies.splice([i], 1);
-                // console.log(this.enemies[i]);
+                
                 this.countTanks--;
+                this.score += 200;
 
                 cancelAnimationFrame(id);
-
 
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
                 }, 500);
-
-                // вызвать метод удаления танка, в который попали
-                // добавить очки за убийство
             }
         }
 
         this.blocks.find(item => {
-            if(this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+            if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
 
                 cancelAnimationFrame(id);
 
@@ -546,6 +635,7 @@ export function Model(){
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
+                    this.bullet = false;
                 }, 500);
             }
         })   
@@ -569,6 +659,7 @@ export function Model(){
             //задержка, чтобы пули не вылетали сразу же после сталкивания
             setTimeout(() => {
                 this.timer = true;
+                this.bullet = false;
             }, 500);
         }
     }
@@ -577,32 +668,31 @@ export function Model(){
     this.checkCollisionBulletDown = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.enemiesPos[i].y && this.bulletY + BULLET_SIZE <= this.enemiesPos[i].y + TANK_SIZE){
+                if(this.enemiesPos[i].tankRed){
+                    this.showBonuses();
+                }
                 this.dt++;
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
                 this.enemies[i].delete(); //удаление танка
-                // console.log(this.enemies);
                 this.enemies.splice([i], 1);
-                // console.log(this.enemies);
+
                 this.countTanks--;
+                this.score += 200;
 
                 cancelAnimationFrame(id);
-
 
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
                 }, 500);
-
-                // вызвать метод удаления танка, в который попали
-                // добавить очки за убийство
             }
         }
 
         this.blocks.find(item => {
-            if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
+            if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
 
                 cancelAnimationFrame(id);
 
@@ -642,6 +732,7 @@ export function Model(){
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
+                    this.bullet = false;
                 }, 500);
             }
         })
@@ -665,6 +756,7 @@ export function Model(){
             //задержка, чтобы пули не вылетали сразу же после сталкивания
             setTimeout(() => {
                 this.timer = true;
+                this.bullet = false;
             }, 500);
         }
     }
@@ -673,32 +765,32 @@ export function Model(){
     this.checkCollisionBulletUp = function(id){
         for(let i = 0; i < this.enemiesPos.length; i++){
             if(this.bulletX + BULLET_SIZE >= this.enemiesPos[i].x && this.bulletX <= this.enemiesPos[i].x + TANK_SIZE && this.bulletY >= this.enemiesPos[i].y && this.bulletY <= this.enemiesPos[i].y + TANK_SIZE){
+                if(this.enemiesPos[i].tankRed){
+                    this.showBonuses();
+                }
                 this.dt++;
+
                 this.explosion(19, this.soundExplosion2);
                 this.enemiesPos.splice([i], 1);
 
                 this.enemies[i].delete(); //удаление танка
-                // console.log(this.enemies);
                 this.enemies.splice([i], 1);
-                // console.log(this.enemies);
+
                 this.countTanks--;
+                this.score += 200;
 
                 cancelAnimationFrame(id);
-
 
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
                 }, 500);
-
-                // вызвать метод удаления танка, в который попали
-                // добавить очки за убийство
             }
         }
 
         this.blocks.find(item => {
-            if(this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
+            if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
 
                 cancelAnimationFrame(id);
 
@@ -729,6 +821,7 @@ export function Model(){
                 //задержка, чтобы пули не вылетали сразу же после сталкивания
                 setTimeout(() => {
                     this.timer = true;
+                    this.bullet = false;
                 }, 500);
             }
         })
@@ -743,6 +836,7 @@ export function Model(){
             //задержка, чтобы пули не вылетали сразу же после сталкивания
             setTimeout(() => {
                 this.timer = true;
+                this.bullet = false;
             }, 500);
         }
     }
@@ -776,8 +870,6 @@ export function Model(){
     }
 
     this.playerOneShiftKeydown = () => {
-        // this.enemiesPos = this.Enemies.giveEnemiesPos();
-
         if(this.isShoots){
             if(!this.bullet && this.timer){
                 this.soundShoot.play();
@@ -829,7 +921,6 @@ export function Model(){
     }
     
     this.gameOver = () => {
-        // console.log(this.soundMotor);
         this.soundMotor.pause();
         this.soundMovement.pause();
         this.game = true;
@@ -837,31 +928,42 @@ export function Model(){
         this.soundGameOver.play();
         this.myView.gameOver();
 
-        // setTimeout(() => {
-            
-        // }, 1000);
+        setTimeout(() => {
+            this.myView.showScoring(this.level, this.score);
+        }, 1000);
+
+        setTimeout(() => {
+            location.reload();
+        }, 3000);
     }
 
     this.start = function(){
-        requestAnimationFrame(this.loop);
+        this.id = requestAnimationFrame(this.loop);
     }
 
     this.loop = () => {
         this.myView.clearField();
         this.playerOneKeydown();
-        this.field();
         this.getEnemisPos();
-        const mainAnimId = requestAnimationFrame(this.loop);
+
+        this.mainAnimId = requestAnimationFrame(this.loop);
 
         if(this.dt === 4){
-            cancelAnimationFrame(mainAnimId);
+            this.soundMotor.pause();
+            this.soundMovement.pause();
+            cancelAnimationFrame(this.mainAnimId);
             this.blocks = [];
             this.enemiesPos = [];
             this.dt = 0;
             this.allEnemiesTanks = 0;
             this.countTanks = 0;
-            // this.showScore();
-            this.nextLevel();
+            setTimeout(() => {
+                this.myView.showScoring(this.level, this.score);
+            }, 100);
+            setTimeout(() => {
+                this.myView.hideScoring(this.level, this.score);
+                this.nextLevel();
+            }, 3000);
         }
     }
 }
