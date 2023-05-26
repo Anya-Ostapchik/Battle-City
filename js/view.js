@@ -16,7 +16,6 @@ export function View(){
         window.addEventListener('load', function (){
             menu.style.top = '50%';
             menu.style.transform = 'translate(0, -50%)';
-            // playerName = prompt('Hello! Write your name', 'player');
         });
 
         menu.style.top = '100%';
@@ -101,7 +100,7 @@ export function View(){
     this.drawEnemyTanks = function(num, x, y){
         ctx.drawImage(image, ...spriteMap[num], x, y, TANK_SIZE, TANK_SIZE);
     }
-
+    
     this.showScoring = function(num, score){
         const scoring = document.querySelector('.score');
         scoring.classList.add('score__active');

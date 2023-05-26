@@ -1,6 +1,6 @@
 import { View } from "./js/view.js";
-import { Model } from "./js/model.js";
-import { Controller } from "./js/controller.js";
+import { Model } from "./js/m.js";
+import { Controller } from "./js/c.js";
 
 const ModelGame = new Model();
 const ViewGame = new View();

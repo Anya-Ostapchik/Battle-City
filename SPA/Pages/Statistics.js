@@ -4,6 +4,13 @@ const Statistics = {
   render: () => {
     return `
       <section class="statistics" id="statistics__content">
+        <table class="statistics__table">
+        <tr>
+          <th>Name</th>
+          <th>Points</th>
+          <th>Place</th>
+        </tr>
+        </table>
         <a href="#main" class="back">BACK</a>
       </section>
     `;

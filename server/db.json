@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "name": "anna",
+      "score": 1900,
+      "id": 1
+    },
+    {
+      "name": "anna",
+      "score": 0,
+      "id": 2
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 3
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 4
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 5
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 6
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 7
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 8
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 9
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 10
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 11
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 12
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 13
+    },
+    {
+      "name": "player",
+      "score": 2800,
+      "id": 14
+    }
+  ]
+}
