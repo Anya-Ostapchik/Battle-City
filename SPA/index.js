@@ -138,13 +138,19 @@ const mySPA = (function () {
       function listUsers(users){
         const table = document.querySelector('.statistics__table');
 
-        for(let i = 0; i <= users.length; i++){
+        for(let i = 0; i < users.length; i++){
           const tr = document.createElement('tr');
-            for(let elem in users[i]){
-                const td = document.createElement('td');
-                td.textContent = users[i][elem];
-                tr.append(td);
-            }
+            // for(let elem in users[i]){
+            //   const td = document.createElement('td');
+            //   td.textContent = users[i][elem];
+            //   tr.append(td);
+            // }
+            const td1 = document.createElement('td');
+            const td2 = document.createElement('td');
+            console.log(users[i]);
+            td1.textContent = users[i].name;
+            td2.textContent = users[i].score;
+            tr.append(td1, td2);
           table.append(tr);
         }
 

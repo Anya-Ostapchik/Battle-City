@@ -19,14 +19,12 @@ const server = http.createServer((req, res) => {
 
             break;
         case "/users":
-            const buffers = [];
+            // const buffers = [];
  
-            for (const chunk of req) {
-                buffers.push(chunk);
-            }
-    
-            // const user = JSON.parse(Buffer.concat(buffers).toString());
-            // console.log(user);
+            // for (const chunk of req) {
+            //     buffers.push(chunk);
+            // }
+
             res.end("Данные успешно получены");
             break;
         default:

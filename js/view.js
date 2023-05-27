@@ -1,24 +1,15 @@
-import { BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, BULLET_SIZE, EAGLE_SIZE, TANK_SIZE, BONUS_SIZE } from "./constants.js";
+import { BLOCK_WIDTH, BLOCK_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, BULLET_SIZE, EAGLE_SIZE, TANK_SIZE } from "./constants.js";
 import { spriteMap } from "./sprite-map.js";
 
 export function View(){
     let ctx = null;
     let image = null;
     let myContent = null;
-    let playerName = null;
 
     this.init = function (content) {
         myContent = content;
         image = new Image();
         image.src = 'img/sprite2.png';
-        const menu = document.querySelector('#menu');
-        
-        window.addEventListener('load', function (){
-            menu.style.top = '50%';
-            menu.style.transform = 'translate(0, -50%)';
-        });
-
-        menu.style.top = '100%';
     }
 
     this.getCanvas = function(){
@@ -26,7 +17,7 @@ export function View(){
     }
 
     //очистка поля
-    this.clearField = function () {
+    this.clearField = () => {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -54,7 +45,6 @@ export function View(){
 
     this.deleteTankIcon = function(){
         const tanks = document.querySelector('.canvas__count-tank');
-
         tanks.lastElementChild.remove();
     }
 
@@ -69,11 +59,11 @@ export function View(){
     }
 
     //отрисовка танка
-    this.drawPlayerOne = function (direction, x, y){
-        ctx.drawImage(image, ...spriteMap[direction], x, y, TANK_SIZE, TANK_SIZE);
+    this.drawTank = function (num, x, y){
+        ctx.drawImage(image, ...spriteMap[num], x, y, TANK_SIZE, TANK_SIZE);
     }
 
-    //отрисовка пули drawBullet
+    //отрисовка пули
     this.drawBullet = (num, x, y) => {
         ctx.drawImage(image, ...spriteMap[num], x, y, BULLET_SIZE, BULLET_SIZE);
     }
@@ -83,24 +73,14 @@ export function View(){
         ctx.drawImage(image, ...spriteMap[num], x, y, w, h);
     }
 
-    //отрисовка бонуса
-    this.drawBonus = function(num, x, y){
-        ctx.drawImage(image, ...spriteMap[num], x, y, BONUS_SIZE, BONUS_SIZE);
-    }
-
     this.gameOver = function(){
         const wrapper = document.querySelector('.canvas__wrapper');
-
         const txt = document.createElement('p');
         txt.classList.add('game_over');
         txt.textContent = 'GAME OVER';
         wrapper.append(txt);
     }
 
-    this.drawEnemyTanks = function(num, x, y){
-        ctx.drawImage(image, ...spriteMap[num], x, y, TANK_SIZE, TANK_SIZE);
-    }
-    
     this.showScoring = function(num, score){
         const scoring = document.querySelector('.score');
         scoring.classList.add('score__active');
