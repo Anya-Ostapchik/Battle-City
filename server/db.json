@@ -2,13 +2,8 @@
   "users": [
     {
       "name": "Anna",
-      "score": 100,
-      "id": 1
-    },
-    {
-      "name": "Anna",
       "score": 0,
-      "id": 2
+      "id": 1
     }
   ]
 }

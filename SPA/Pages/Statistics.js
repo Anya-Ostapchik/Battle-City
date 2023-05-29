@@ -8,7 +8,6 @@ const Statistics = {
         <tr>
           <th>Name</th>
           <th>Points</th>
-          <th>Place</th>
         </tr>
         </table>
         <a href="#main" class="back">BACK</a>

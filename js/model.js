@@ -6,27 +6,13 @@ import { Tank } from "./tank.js";
 
 export function Model(){
     this.direction = 7;
+    this.i = 15;
     this.level = 1;
     this.numLives = 5;
-    this.i = 15;
-    this.blocks = [];
-    this.eagleState = 20;
-    this.isMoving = false;
-    this.isShoots = false;
-    this.game = false;
-    this.countTanks = 0;
-    this.k = 1;
-    this.enemiesPosY = 0;
-    this.enemiesPos = [];
-    this.allEnemiesTanks = 0;
-    this.enemies = [];
-    this.dt = 0;
-    this.score = 0;
     
     this.init = function(view){
         this.myView = view;
 
-        this.soundStageStart = new Audio('sound/sound_stage_start.ogg');
         this.soundGameOver = new Audio('sound/sound_game_over.ogg');
         this.soundMovement = new Audio('sound/sound-movement.ogg');
         this.soundMovement.loop = true;
@@ -34,13 +20,12 @@ export function Model(){
         this.soundMotor.loop = true;
         this.soundMotor.volume = 0.2;
 
-        if(!localStorage.getItem('name')){
+        if(localStorage.getItem('PlayerName') === null){
             this.playerName = prompt('Write your name');
-            localStorage.setItem('name', this.playerName);
-        } else if(localStorage.getItem('name') === 'undefined' || localStorage.getItem('name') === 'null'){
-            localStorage.setItem('name', 'Player');
+            localStorage.setItem('PlayerName', this.playerName);
+        } else if(localStorage.getItem('PlayerName') === undefined){
+            localStorage.setItem('PlayerName', 'Player');
         }
-
     }
 
     this.getCanvas = function () {
@@ -64,6 +49,19 @@ export function Model(){
     }
 
     this.gameStartOnePlayer = () => {
+        this.blocks = [];
+        this.eagleState = 20;
+        this.isMoving = false;
+        this.isShoots = false;
+        this.game = false;
+        this.countTanks = 0;
+        this.k = 1;
+        this.enemiesPosY = 0;
+        this.allEnemiesTanks = 0;
+        this.enemies = [];
+        this.dt = 0;
+        this.score = 0;
+    
         this.playerX = 9 * BLOCK_WIDTH;
         this.playerY = CANVAS_HEIGHT - TANK_SIZE;
 
@@ -73,8 +71,11 @@ export function Model(){
 
         this.getElemsMap();
         requestAnimationFrame(this.clear);
-        this.start();
         this.myView.drawRemainingTanks();
+
+        setTimeout(() => {
+            this.start();
+        }, 5000);
     }
 
     this.drawEnemyTanks = () => {
@@ -105,16 +106,6 @@ export function Model(){
         }
     }
 
-    this.getEnemisPos = function(){
-        for (let i = 0; i < this.countTanks; i++) {
-            this.enemiesPos[i] = this.enemies[i].givePos();
-        }
-    }
-
-    this.getPlayerPos = function(){
-        this.playerPos = this.tank.givePos();
-    }
-
     this.nextLevel = function(){
         this.soundMotor.play();
         this.soundMovement.play();
@@ -140,7 +131,6 @@ export function Model(){
 
     this.tankKilled = function(i){
         this.dt++;
-
         this.enemies[i].delete();
         this.enemies.splice([i], 1);
 
@@ -174,18 +164,30 @@ export function Model(){
         this.soundMotor.pause();
         this.soundMovement.pause();
         this.game = true;
-        
-        this.soundGameOver.play();
-        this.myView.gameOver();
-        this.statictic();
+        this.level = 1;
+        this.numLives = 5;
+
+        for(let i = this.enemies.length - 1; i >= 0; i--){
+            this.enemies[i].delete();
+            this.enemies.splice([i], 1);
+        }
+
+        cancelAnimationFrame(this.mainAnimId);
 
         setTimeout(() => {
-            this.myView.showScoring(this.level, this.score);
+            cancelAnimationFrame(this.clearId);
+            this.soundGameOver.play();
+            this.myView.gameOver();
         }, 1000);
 
         setTimeout(() => {
-            location.reload();
-        }, 3000);
+            this.myView.showScoring(this.level, this.score);
+        }, 2000);
+
+        setTimeout(() => {
+            location.hash = '#main';
+            this.statictic();
+        }, 5000);
     }
 
     this.start = function(){
@@ -194,16 +196,14 @@ export function Model(){
 
     this.clear = () => {
         this.myView.clearField();
-        requestAnimationFrame(this.clear);
+        this.clearId = requestAnimationFrame(this.clear);
     }
 
-    //отправить данные на  сервер
-    this.statictic = function(){
+    this.statictic = async function(){
         let user = {
-            name: this.playerName,
+            name: localStorage.getItem('PlayerName'),
             score: this.score
         };
-        
         try{
             fetch('http://localhost:9090/users', {
                 method: 'POST',
@@ -222,11 +222,12 @@ export function Model(){
         this.tank.getParams(this.direction);
         this.playerOneKeydown();
         this.drawEnemyTanks();
-        this.getEnemisPos();
-        this.getPlayerPos();
         this.field();
-
         this.mainAnimId = requestAnimationFrame(this.loop);
+
+        if(this.dt === 20 && this.level === 2){
+            this.gameOver();
+        }
 
         if(this.dt === 20){
             this.soundMotor.pause();
@@ -234,7 +235,6 @@ export function Model(){
             cancelAnimationFrame(this.mainAnimId);
             this.blocks = [];
             this.enemies = [];
-            this.enemiesPos = [];
             this.dt = 0;
             this.allEnemiesTanks = 0;
             this.countTanks = 0;

@@ -41,21 +41,21 @@ body{
     background-repeat: no-repeat;
     margin-bottom: 50px;
 }
-ul{
+.menu ul{
     display: flex;
     flex-direction: column;
     text-align: left;
 }
-li{
+.menu li{
     display: inline-block;
     margin-bottom: 10px;
     list-style: none;
     position: relative;
 }
-li:last-child{
+.menu li:last-child{
     margin: 0;
 }
-li:hover:before{
+.menu li:hover:before{
     content: '';
     display: inline-block;
     width: 32px;
@@ -116,6 +116,9 @@ li:hover:before{
     text-decoration: none;
     color: #fff;
 }
+.rules__phone{
+    display: none;
+}
 /* Rules end*/
 /* Level start */
 .level {
@@ -140,10 +143,6 @@ li:hover:before{
 /* Level end */
 /* Canvas start*/
 .canvas__wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 50px;
     width: 100%;
     height: 100%;
     background-color: #636363;
@@ -151,6 +150,11 @@ li:hover:before{
 }
 .canvas__wrapper{
     position: relative;
+    top: 50%;
+    transform: translate(0, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 }
 .game_over{
     position: absolute;
@@ -163,9 +167,10 @@ li:hover:before{
 }
 .canvas{
     display: inline-block;
+    position: relative;
 }
 .canvas__info {
-    height: 95%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -176,7 +181,7 @@ li:hover:before{
 .canvas__count-tank {
     display: grid;
     grid-template: 1fr / 1fr 1fr;
-    /* margin-bottom: 50px; */
+    margin-bottom: 50px;
 }
 .canvas__new_tank{
     display: inline-block;
@@ -212,6 +217,9 @@ li:hover:before{
     background-repeat: no-repeat;
     margin-right: 15px;
 }
+.control, .canvas__shoot{
+    display: none;
+}
 /* Canvas end*/
 /* Score start */
 .score {
@@ -242,7 +250,7 @@ li:hover:before{
 /* Score end */
 /* Statistic start */
 .statistics{
-    font-size: 40px;
+    font-size: 24px;
     position: relative;
     top: 50%;
     transform: translate(0, -50%);
@@ -253,9 +261,9 @@ li:hover:before{
     margin: 0 auto;
 }
 .statistics__table{
-    margin: 0 auto 50px;
+    margin: 0 auto 30px;
     border: 1px solid #fff;
-    border-spacing: 40px 20px;
+    border-spacing: 20px;
     display: none;
 }
 .active{
@@ -267,26 +275,236 @@ li:hover:before{
 }
 /* Statistic end */
 
-@media (max-width: 1180px){
+@media (max-width: 983px) and (orientation: portrait), (max-width: 1180px) and (orientation: landscape){
     .img__wrapper{
-        margin-bottom: 30px;
+        margin-bottom: 50px;
     }
     .list{
-        font-size: 30px;
+        font-size: 40px;
     }
     .rules__title {
-        margin-bottom: 15px;
-        font-size: 20px;
+        margin-bottom: 25px;
+        font-size: 24px;
     }
     .rules__text_wrap{
         margin-bottom: 10px;
     }
     .rules__player {
         margin-bottom: 10px;
-        font-size: 20px;
+        font-size: 24px;
+    }
+    .rules__text_wrap{
+        display: none;
+    }
+    .rules__phone{
+        display: inline-block;
+        position: relative;
+        left: 50%;
+        transform: translate(-50%, 0);
+        margin-bottom: 30px;
+    }
+    .rules__text_elem_shoot{
+        width: 32px;
+        height: 32px;
     }
     .rules__text {
-        font-size: 16px;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    .rules__text_elem{
+        font-size: 24px;
+    }
+    .rules__wish {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .back{
+        font-size: 24px;
+    }
+    .game_over{
+        font-size: 30px;
+    }
+    .canvas__wrap {
+        justify-content: center;
+        gap: 0px;
+    }
+    .canvas__info {
+        display: none;
+    }
+    #canvas{
+        width: 90%;
+    }
+    .canvas__wrapper{
+        text-align: center;
+    }
+    .control{
+        display: inline-block;
+        width: 192px;
+        height: 192px;
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        z-index: 5;
+    }
+    .canvas__arrow{
+        position: absolute;
+        width: 64px;
+        height: 64px;
+    }
+    .canvas__arrow-up{
+        left: 50%;
+        transform: translate(-50%, 0)
+    }
+    .canvas__arrow-left{
+        top: 50%;
+        transform: translate(0, -50%) rotate(270deg);
+    }
+    .canvas__arrow-down{
+        left: 50%;
+        bottom: 0%;
+        transform: translate(-50%, 0) rotate(180deg);
+    }
+    .canvas__arrow-right{
+        top: 50%;
+        right: 0%;
+        transform: translate(0, -50%) rotate(90deg);
+    }
+    .canvas__shoot{
+        display: inline-block;
+        position: absolute;
+        top: 55%;
+        right: 10%;
+        z-index: 5;
+        width: 128px;
+        height: 128px;
+    }
+    .statistics{
+        font-size: 30px;
+    }
+    .statistics__table{
+        margin: 0 auto 30px;
+        border-spacing: 20px 15px;
+    }
+    .nested-table{
+        border-spacing: 20px 15px;
+    }
+}
+@media (max-width: 800px) and (orientation: portrait){
+    .control{
+        width: 150px;
+        height: 150px;
+        top: 55%;
+    }
+    .canvas__arrow{
+        width: 50px;
+        height: 50px;
+    }
+    .canvas__shoot{
+        top: 57%;
+        width: 110px;
+        height: 110px;
+    }
+}
+@media (max-width: 700px) and (orientation: portrait){
+    .control{
+        width: 120px;
+        height: 120px;
+    }
+    .canvas__arrow{
+        width: 40px;
+        height: 40px;
+    }
+    .canvas__shoot{
+        width: 90px;
+        height: 90px;
+    }
+    .statistics{
+        font-size: 24px;
+    }
+    .statistics__table{
+        margin: 0 auto 20px;
+        border-spacing: 10px;
+    }
+    .nested-table{
+        border-spacing: 10px;
+    }
+}
+@media (max-width: 550px) and (orientation: portrait){
+    .control{
+        width: 90px;
+        height: 90px;
+    }
+    .canvas__arrow{
+        width: 30px;
+        height: 30px;
+    }
+    .canvas__shoot{
+        width: 70px;
+        height: 70px;
+    }
+}
+@media (max-width: 450px) and (orientation: portrait){
+    .control{
+        width: 60px;
+        height: 60px;
+        top: 58%;
+    }
+    .canvas__arrow{
+        width: 20px;
+        height: 20px;
+    }
+    .canvas__shoot{
+        top: 59%;
+        width: 50px;
+        height: 50px;
+    }
+    .statistics{
+        font-size: 20px;
+    }
+    .statistics__table td{
+        border-spacing: 5px;
+    }
+    .statistics__table td{
+        border: none;
+    }
+    .nested-table{
+        border: 1px solid #fff;
+        border-spacing: 5px;
+    }
+}
+@media (max-width: 1180px) and (orientation: landscape){
+    .control{
+        width: 180px;
+        height: 180px;
+        top: 65%;
+    }
+    .canvas__arrow{
+        width: 60px;
+        height: 60px;
+    }
+    .canvas__shoot {
+        top: 70%;
+        width: 130px;
+        height: 130px;
+    }
+}
+@media (max-width: 900px) and (orientation: landscape){
+    .list{
+        font-size: 30px;
+    }
+    .rules__title {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    .rules__player {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    .rules__phone{
+        margin-bottom: 10px;
+    }
+    .rules__text {
+        font-size: 18px;
         margin-bottom: 10px;
     }
     .rules__text_elem{
@@ -296,22 +514,35 @@ li:hover:before{
         font-size: 20px;
         margin-bottom: 10px;
     }
-    .back{
+    #canvas{
+        width: 61%;
+    }
+    .control{
+        width: 90px;
+        height: 90px;
+        top: 67%;
+        left: 22%;
+    }
+    .canvas__arrow{
+        width: 30px;
+        height: 30px;
+    }
+    .canvas__shoot {
+        top: 69%;
+        right: 22%;
+        width: 70px;
+        height: 70px;
+    }
+    .statistics{
         font-size: 20px;
     }
-    .game_over{
-        font-size: 30px;
+    .statistics__table{
+        margin: 0 auto 10px;
+        border-spacing: 10px;
     }
-    .canvas__info {
-        font-size: 16px;
-    }
-    .canvas__lives{
-        margin-bottom: 16px;
-    }
-    .canvas__player {
-        font-size: 16px;
-    }
+}
+@media (max-width: 700px) and (orientation: landscape){
     #canvas{
-        width: 50%;
+        width: 75%;
     }
 }

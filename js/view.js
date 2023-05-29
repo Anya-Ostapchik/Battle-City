@@ -74,11 +74,10 @@ export function View(){
     }
 
     this.gameOver = function(){
-        const wrapper = document.querySelector('.canvas__wrapper');
-        const txt = document.createElement('p');
-        txt.classList.add('game_over');
-        txt.textContent = 'GAME OVER';
-        wrapper.append(txt);
+        ctx.font = "48px Russo One";
+        ctx.fillStyle = 'red';
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     }
 
     this.showScoring = function(num, score){

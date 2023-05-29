@@ -7,18 +7,11 @@ export function Controller() {
         myModel = model;
         myContainer = container;
 
-        container.addEventListener('click', (e) => {
+        myContainer.addEventListener('click', (e) => {
             if(e.target.getAttribute("href") === '#game'){
                 this.gameStartOnePlayer();
             }
         });
-
-    //     window.onbeforeunload = function() {
-    //         // hashPageName = 'main';
-    //         // myModuleModel.updateState(hashPageName);
-    //         location.hash = '#main';
-    //         return false;
-    //   };
     }
 
     this.gameStartOnePlayer = () => {
@@ -74,6 +67,57 @@ export function Controller() {
                 default:
                     break;
             } 
+        });
+
+        myContainer.addEventListener('touchstart', function (e){
+            switch (e.target.getAttribute("id")) {
+                case 'canvas__arrow-up':
+                    myModel.isMoving = true;
+                    myModel.direction = 7;
+                    break;
+                case 'canvas__arrow-left':
+                    myModel.isMoving = true;
+                    myModel.direction = 10;
+                    break;
+                case 'canvas__arrow-down':
+                    myModel.isMoving = true;
+                    myModel.direction = 9;
+                    break;
+                case 'canvas__arrow-right':
+                    myModel.isMoving = true;
+                    myModel.direction = 8;
+                    break;
+                case 'canvas__shoot':
+                    myModel.isShoots = true;
+                    myModel.playerOneShiftKeydown();
+                    break;
+            
+                default:
+                    break;
+            }
+        });
+
+        myContainer.addEventListener('touchend', function (e){
+            switch (e.target.getAttribute("id")) {
+                case 'canvas__arrow-up':
+                    myModel.isMoving = false;
+                    break;
+                case 'canvas__arrow-left':
+                    myModel.isMoving = false;
+                    break;
+                case 'canvas__arrow-down':
+                    myModel.isMoving = false;
+                    break;
+                case 'canvas__arrow-right':
+                    myModel.isMoving = false;
+                    break;
+                case 'canvas__shoot':
+                    myModel.isShoots = true;
+                    myModel.playerOneShiftKeydown();
+                    break;
+                default:
+                    break;
+            }
         });
     }
 }

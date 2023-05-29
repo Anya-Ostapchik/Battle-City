@@ -49,33 +49,27 @@ const mySPA = (function () {
       window.document.title = routes[routeName].title;
       contentContainer.innerHTML = routes[routeName].render();
 
-      // if(_hashPageName === 'statistics'){
-        
-      // }
+      if(_hashPageName === 'game'){
+        const level = document.querySelector('.level');
+        level.classList.add('level_active');
 
-      // if(_hashPageName === 'game'){
+        let i = 0;
 
-      //   const level = document.querySelector('.level');
-      //   level.classList.add('level_active');
-
-      //   let i = 0;
-
-      //   const id = setInterval(() => {
-      //     i++;
-      //     if(i === 2){
-      //       soundStageStart.play();
-      //     }
-      //     if(i === 5){
-      //       level.classList.remove('level_active');
-      //       clearInterval(id);
-      //     }
-      //   }, 1000);
-      // }
+        const id = setInterval(() => {
+          i++;
+          if(i === 2){
+            soundStageStart.play();
+          }
+          if(i === 5){
+            level.classList.remove('level_active');
+            clearInterval(id);
+          }
+        }, 1000);
+      }
     }
 
     this.createLoader = function(){
       const statistics = document.querySelector('#statistics__content');
-      //лоадер
       const svgNS = "http://www.w3.org/2000/svg";
       const svg = document.createElementNS(svgNS,"svg");
       svg.setAttributeNS(null, "viewBox", '0 0 25 25');
@@ -93,7 +87,6 @@ const mySPA = (function () {
       anim = requestAnimationFrame(this.loaderAnim);
     }
 
-    //остановка лоадера
     this.removeLoader = function(){
       cancelAnimationFrame(anim);
       svgElem.remove();
@@ -138,23 +131,54 @@ const mySPA = (function () {
       function listUsers(users){
         const table = document.querySelector('.statistics__table');
 
-        for(let i = 0; i < users.length; i++){
-          const tr = document.createElement('tr');
-            // for(let elem in users[i]){
-            //   const td = document.createElement('td');
-            //   td.textContent = users[i][elem];
-            //   tr.append(td);
-            // }
-            const td1 = document.createElement('td');
-            const td2 = document.createElement('td');
-            console.log(users[i]);
-            td1.textContent = users[i].name;
-            td2.textContent = users[i].score;
-            tr.append(td1, td2);
-          table.append(tr);
+          if(users.length === 0){
+            table.classList.add('active');
+          }else if(users.length <= 5){
+            for(let i = users.length - 1; i > 0; i--){
+              const tr = document.createElement('tr');
+                const td1 = document.createElement('td');
+                const td2 = document.createElement('td');
+                td1.textContent = users[i].name;
+                td2.textContent = users[i].score;
+                tr.append(td1, td2);
+              table.append(tr);
+            }
+            table.classList.add('active');
+          }else{
+              const tr = document.createElement('tr');
+  
+              const td1 = document.createElement('td');
+              const table1 = document.createElement('table');
+              table1.classList.add('nested-table');
+              for(let i = users.length - 1; i > users.length - 1 - 5; i--){
+                const tr1 = document.createElement('tr');
+                const td1 = document.createElement('td');
+                const td2 = document.createElement('td');
+                td1.textContent = users[i].name;
+                td2.textContent = users[i].score;
+                tr1.append(td1, td2);
+                table1.append(tr1);
+              }
+              td1.append(table1);
+  
+              const td2 = document.createElement('td');
+              const table2 = document.createElement('table');
+              table2.classList.add('nested-table');
+              for(let i = users.length - 1 - 5; i > users.length - 1 - 10; i--){
+                const tr2 = document.createElement('tr');
+                const td1 = document.createElement('td');
+                const td2 = document.createElement('td');
+                td1.textContent = users[i].name;
+                td2.textContent = users[i].score;
+                tr2.append(td1, td2);
+                table2.append(tr2);
+              }
+              td2.append(table2);
+  
+              tr.append(td1, td2);
+              table.append(tr)
+              table.classList.add('active');
         }
-
-        table.classList.add('active');
       }
   
       getUsers();
@@ -171,7 +195,6 @@ const mySPA = (function () {
       myModuleModel = model;
       myModuleContainer = content;
 
-      // вешаем слушателей на событие hashchange и beforeunload
       window.addEventListener("hashchange", this.updateState);
 
       window.addEventListener('click', function (){
@@ -183,13 +206,11 @@ const mySPA = (function () {
         window.location.hash = event.target.getAttribute("href");
       });
 
+      window.onbeforeunload = function() {
+        return false;
+      };
 
-      // window.onbeforeunload = function() {
-      //   return false;
-      // };
-
-
-      this.updateState(); //первая отрисовка
+      this.updateState();
     }
 
     this.updateState = function() {
@@ -210,7 +231,6 @@ const mySPA = (function () {
       const model = new ModuleModel();
       const controller = new ModuleController();
 
-      //связываем части модуля
       view.init(document.getElementById(root), routes);
       model.init(view);
       controller.init(document.getElementById(root), model);

@@ -414,8 +414,8 @@ export function Tank(){
         }
 
         if(this.name === 'player'){
-            for(let i = 0; i < this.player.enemiesPos.length; i++){
-                if(this.bulletX + BULLET_SIZE >= this.player.enemiesPos[i].x && this.bulletX <= this.player.enemiesPos[i].x + TANK_SIZE && this.bulletY >= this.player.enemiesPos[i].y && this.bulletY <= this.player.enemiesPos[i].y + TANK_SIZE){
+            for(let i = 0; i < this.player.enemies.length; i++){
+                if(this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE && this.bulletY >= this.player.enemies[i].posY && this.bulletY <= this.player.enemies[i].posY + TANK_SIZE){
                     this.explosion();
 
                     cancelAnimationFrame(id);
@@ -430,7 +430,7 @@ export function Tank(){
             }
         }
         else if(this.name === 'enemy'){
-            if(this.bulletY + BULLET_SIZE >= this.player.playerPos.y && this.bulletY <= this.player.playerPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.playerPos.x && this.bulletX <= this.player.playerPos.x + TANK_SIZE){
+            if(this.bulletY + BULLET_SIZE >= this.player.tank.posY && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE){
                 this.explosion();
 
                 cancelAnimationFrame(id);
@@ -513,8 +513,8 @@ export function Tank(){
         }
 
         if(this.name === 'player'){
-            for(let i = 0; i < this.player.enemiesPos.length; i++){
-                if(this.bulletY + BULLET_SIZE >= this.player.enemiesPos[i].y && this.bulletY <= this.player.enemiesPos[i].y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.enemiesPos[i].x && this.bulletX <= this.player.enemiesPos[i].x + TANK_SIZE){
+            for(let i = 0; i < this.player.enemies.length; i++){
+                if(this.bulletY + BULLET_SIZE >= this.player.enemies[i].posY && this.bulletY <= this.player.enemies[i].posY + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE){
                     this.explosion();
 
                     this.player.tankKilled(i);
@@ -528,7 +528,7 @@ export function Tank(){
                 }
             }
         }else if(this.name === 'enemy'){
-            if(this.bulletY + BULLET_SIZE >= this.player.playerPos.y && this.bulletY <= this.player.playerPos.y + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.playerPos.x && this.bulletX <= this.player.playerPos.x + TANK_SIZE){
+            if(this.bulletY + BULLET_SIZE >= this.player.tank.posY && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE){
                 this.explosion();
                 cancelAnimationFrame(id);
                 this.player.revivalPlayer();
@@ -612,8 +612,8 @@ export function Tank(){
         }
 
         if(this.name === 'player'){
-            for(let i = 0; i < this.player.enemiesPos.length; i++){
-                if(this.bulletX + BULLET_SIZE >= this.player.enemiesPos[i].x && this.bulletX <= this.player.enemiesPos[i].x + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.player.enemiesPos[i].y && this.bulletY + BULLET_SIZE <= this.player.enemiesPos[i].y + TANK_SIZE){
+            for(let i = 0; i < this.player.enemies.length; i++){
+                if(this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.player.enemies[i].posY && this.bulletY + BULLET_SIZE <= this.player.enemies[i].posY + TANK_SIZE){
                     this.explosion();
 
                     this.player.tankKilled(i);
@@ -627,7 +627,7 @@ export function Tank(){
                 }
             }
         }else if(this.name === 'enemy'){
-            if(this.bulletX + BULLET_SIZE >= this.player.playerPos.x && this.bulletX <= this.player.playerPos.x + TANK_SIZE && this.bulletY + BULLET_SIZE <= this.player.playerPos.y + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.player.playerPos.y){
+            if(this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE && this.bulletY + BULLET_SIZE <= this.player.tank.posY + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.player.tank.posY){
                 this.explosion();
                 cancelAnimationFrame(id);
                 this.player.revivalPlayer();
@@ -693,8 +693,8 @@ export function Tank(){
         }
 
         if(this.name === 'player'){
-            for(let i = 0; i < this.player.enemiesPos.length; i++){
-                if(this.bulletX + BULLET_SIZE >= this.player.enemiesPos[i].x && this.bulletX <= this.player.enemiesPos[i].x + TANK_SIZE && this.bulletY >= this.player.enemiesPos[i].y && this.bulletY <= this.player.enemiesPos[i].y + TANK_SIZE){
+            for(let i = 0; i < this.player.enemies.length; i++){
+                if(this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE && this.bulletY >= this.player.enemies[i].posY && this.bulletY <= this.player.enemies[i].posY + TANK_SIZE){
                     this.explosion();
                     this.player.tankKilled(i);
                     cancelAnimationFrame(id);
@@ -706,7 +706,7 @@ export function Tank(){
                 }
             }
         }else if(this.name === 'enemy'){
-            if(this.bulletX + BULLET_SIZE >= this.player.playerPos.x && this.bulletX <= this.player.playerPos.x + TANK_SIZE && this.bulletY <= this.player.playerPos.y + TANK_SIZE && this.bulletY >= this.player.playerPos.y){
+            if(this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletY >= this.player.tank.posY){
                 this.explosion();
                 cancelAnimationFrame(id);
                 this.player.revivalPlayer();
@@ -756,10 +756,6 @@ export function Tank(){
         }, 100);
 
         this.soundExplosion2.play();
-    }
-
-    this.givePos = function(){
-        return {x: this.posX, y: this.posY, c: this.allEnemiesTanks};
     }
 
     this.delete = function(){
