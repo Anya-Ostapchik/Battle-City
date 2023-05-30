@@ -52,6 +52,7 @@ export function Model(){
         this.isMoving = false;
         this.isShoots = false;
         this.game = false;
+        this.flag = true;
         this.countTanks = 0;
         this.k = 1;
         this.enemiesPosY = 0;
@@ -226,7 +227,34 @@ export function Model(){
         this.drawEnemyTanks();
 
         if(this.dt === 20 && this.level === 5){
-            this.gameOver();
+            this.dt = 0;
+            this.flag = false;
+            this.game = true;
+            this.soundMotor.pause();
+            this.soundMovement.pause();
+            setTimeout(() => {
+                this.myView.showScoring(this.level, this.score);
+            }, 100);
+            let user = {
+                name: localStorage.getItem('PlayerName'),
+                score: this.score
+            };
+            setTimeout(() => {
+                this.myView.hideScoring(this.level, this.score);
+                this.level = 1;
+                this.numLives = 5;
+                for(let i = this.enemies.length - 1; i >= 0; i--){
+                    this.enemies[i].delete();
+                }
+        
+                this.soundGameOver.play();
+                this.myView.gameOver();
+            }, 3000);
+
+            setTimeout(() => {
+                location.hash = '#main';
+                this.statictic(user);
+            }, 5000);
         } else if(this.dt === 20){
             this.flag = false;
             for(let i = this.enemies.length - 1; i >= 0; i--){
