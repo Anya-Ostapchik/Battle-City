@@ -7,7 +7,7 @@ import { Tank } from "./tank.js";
 export function Model(){
     this.direction = 7;
     this.i = 15;
-    this.level = 5;
+    this.level = 1;
     this.numLives = 5;
     this.flag = true;
     
@@ -226,7 +226,7 @@ export function Model(){
         this.playerOneKeydown();
         this.drawEnemyTanks();
 
-        if(this.dt === 20 && this.level === 4){
+        if(this.dt === 20 && this.level === 5){
             this.gameOver();
         } else if(this.dt === 20){
             this.flag = false;
