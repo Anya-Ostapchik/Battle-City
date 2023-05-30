@@ -71,10 +71,8 @@ export function Model(){
         requestAnimationFrame(this.clear);
         this.myView.drawRemainingTanks();
 
-        setTimeout(() => {
-            this.start();
-            requestAnimationFrame(this.field);
-        }, 5000);
+        this.start();
+        requestAnimationFrame(this.field);
     }
 
     this.drawEnemyTanks = () => {
@@ -99,8 +97,9 @@ export function Model(){
                 this.enemies[this.countTanks].loop();
                 
                 this.countTanks++;
-
-                this.myView.deleteTankIcon();
+                if(this.allEnemiesTanks < 20){
+                    this.myView.deleteTankIcon();
+                }
             }
         }
     }
