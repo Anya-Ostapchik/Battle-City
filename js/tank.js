@@ -3,6 +3,8 @@ import { TANK_SIZE, CANVAS_WIDTH, CANVAS_HEIGHT, MEASUREMENT_ERROR, EAGLE_SIZE, 
 export function Tank(){
     this.bullet = false;
     this.timer = true;
+    this.flag = true;
+    this.mainAnim = true;
     this.eagleState = 20;
     this.i = 15;
     this.soundShoot = new Audio('sound/sound_bullet_shot.ogg');
@@ -323,20 +325,22 @@ export function Tank(){
 
     this.bulletMovement = () => {
         this.timer = false;
-        const animId = requestAnimationFrame(this.bulletMovement);
+        if(this.player.flag && this.flag){
+            requestAnimationFrame(this.bulletMovement);
+        }
 
         switch (this.bulletDirection) {
             case 11:
-                this.checkCollisionBulletUp(animId);
+                this.checkCollisionBulletUp();
                 break;
             case 13:
-                this.checkCollisionBulletDown(animId);
+                this.checkCollisionBulletDown();
                 break;
             case 14:
-                this.checkCollisionBulletLeft(animId);
+                this.checkCollisionBulletLeft();
                 break;
             case 12:
-                this.checkCollisionBulletRight(animId);
+                this.checkCollisionBulletRight();
                 break;
         
             default:
@@ -350,13 +354,13 @@ export function Tank(){
     }
 
     //столкновение пули, когда она летит влево
-    this.checkCollisionBulletLeft = function(id){
+    this.checkCollisionBulletLeft = function(){
         this.player.blocks.find((item, index) => {
             if(!item){
                 this.player.blocks.splice(index, 0);
             } else{
-                if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
-                    cancelAnimationFrame(id);
+                if(item.material !== 42 && item.material !== 43 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+                    this.flag = false;
                     if(this.name === 'player'){
                         this.soundBulletHit2.play();
                     }
@@ -385,6 +389,7 @@ export function Tank(){
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
@@ -393,14 +398,14 @@ export function Tank(){
         //столкновение с орлом
         if(this.bulletY + BULLET_SIZE >= 24 * BLOCK_HEIGHT && this.bulletY <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.bulletX + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.bulletX <= 12 * BLOCK_WIDTH + EAGLE_SIZE){
             this.explosion();
-            cancelAnimationFrame(id);
+            this.flag = false;
             this.player.eagleState = 21;
             this.player.gameOver();
         }
       
         //столкновение с границами карты
         if(this.bulletX <= 0){
-            cancelAnimationFrame(id);
+            this.flag = false;
 
             if(this.name === 'player'){
                 this.soundBulletHit1.play();
@@ -409,6 +414,7 @@ export function Tank(){
             setTimeout(() => {
                 this.timer = true;
                 this.bullet = false;
+                this.flag = true;
             }, this.delay);
 
         }
@@ -418,13 +424,14 @@ export function Tank(){
                 if(this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE && this.bulletY >= this.player.enemies[i].posY && this.bulletY <= this.player.enemies[i].posY + TANK_SIZE){
                     this.explosion();
 
-                    cancelAnimationFrame(id);
+                    this.flag = false;
 
                     this.player.tankKilled(i);
 
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
@@ -433,12 +440,13 @@ export function Tank(){
             if(this.bulletY + BULLET_SIZE >= this.player.tank.posY && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE){
                 this.explosion();
 
-                cancelAnimationFrame(id);
+                this.flag = false;
                 this.player.revivalPlayer();
     
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
+                    this.flag = true;
                 }, this.delay);
             }
         }
@@ -450,11 +458,11 @@ export function Tank(){
             if(!item){
                 this.player.blocks.splice(index, 0);
             } else{
-                if(item.material !== 42 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
+                if(item.material !== 42 && item.material !== 43 && this.bulletY + BULLET_SIZE >= item.y && this.bulletY <= item.y + item.height && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width){
                     if(this.name === 'player'){
                         this.soundBulletHit2.play();
                     }
-                    cancelAnimationFrame(id);
+                            this.flag = false;
 
                     if(item.material !== 2){
                         if(item.material === 4){
@@ -486,6 +494,7 @@ export function Tank(){
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
@@ -494,7 +503,7 @@ export function Tank(){
         //столкновение с орлом
         if(this.bulletY + BULLET_SIZE >= 24 * BLOCK_HEIGHT && this.bulletY <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.bulletX + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.bulletX <= 12 * BLOCK_WIDTH + EAGLE_SIZE){
             this.explosion();
-            cancelAnimationFrame(id);
+            this.flag = false;
             this.player.eagleState = 21;
             this.player.gameOver();
         }
@@ -504,11 +513,12 @@ export function Tank(){
             if(this.name === 'player'){
                 this.soundBulletHit1.play();
             }
-            cancelAnimationFrame(id);
+            this.flag = false;
 
             setTimeout(() => {
                 this.timer = true;
                 this.bullet = false;
+                this.flag = true;
             }, this.delay);
         }
 
@@ -519,23 +529,25 @@ export function Tank(){
 
                     this.player.tankKilled(i);
     
-                    cancelAnimationFrame(id);
+                    this.flag = false;
 
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
         }else if(this.name === 'enemy'){
             if(this.bulletY + BULLET_SIZE >= this.player.tank.posY && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE){
                 this.explosion();
-                cancelAnimationFrame(id);
+                    this.flag = false;
                 this.player.revivalPlayer();
     
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
+                    this.flag = true;
                 }, this.delay);
             }
         }
@@ -547,11 +559,11 @@ export function Tank(){
             if(!item){
                 this.player.blocks.splice(index, 0);
             } else{
-                if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
+                if(item.material !== 42 && item.material !== 43 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY + BULLET_SIZE <= item.y + item.height && this.bulletY + BULLET_SIZE >= item.y){
                     if(this.name === 'player'){
                         this.soundBulletHit2.play();
                     }
-                    cancelAnimationFrame(id);
+                            this.flag = false;
 
                     if(item.material !== 2){
                         if(item.material === 6){
@@ -583,6 +595,7 @@ export function Tank(){
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
@@ -591,7 +604,7 @@ export function Tank(){
         //столкновение с орлом
         if(this.bulletX + BULLET_SIZE >= 12 * BLOCK_WIDTH && this.bulletX <= 12 * BLOCK_WIDTH + EAGLE_SIZE && this.bulletY + BULLET_SIZE <= 24 * BLOCK_HEIGHT + EAGLE_SIZE && this.bulletY + BULLET_SIZE >= 24 * BLOCK_HEIGHT){
             this.explosion();
-            cancelAnimationFrame(id);
+            this.flag = false;
             this.player.eagleState = 21;
             this.player.gameOver();
         }
@@ -600,14 +613,14 @@ export function Tank(){
         if(this.bulletY > CANVAS_HEIGHT - BULLET_SIZE){
             if(this.name === 'player'){
                 this.soundBulletHit1.play();
-                //взрыв
             }
-            cancelAnimationFrame(id);
+            this.flag = false;
                     
 
             setTimeout(() => {
                 this.timer = true;
                 this.bullet = false;
+                this.flag = true;
             }, this.delay);
         }
 
@@ -618,23 +631,25 @@ export function Tank(){
 
                     this.player.tankKilled(i);
     
-                    cancelAnimationFrame(id);
+                            this.flag = false;
 
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
         }else if(this.name === 'enemy'){
             if(this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE && this.bulletY + BULLET_SIZE <= this.player.tank.posY + TANK_SIZE && this.bulletY + BULLET_SIZE >= this.player.tank.posY){
                 this.explosion();
-                cancelAnimationFrame(id);
+                    this.flag = false;
                 this.player.revivalPlayer();
     
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
+                    this.flag = true;
                 }, this.delay);
             }
         }
@@ -646,11 +661,11 @@ export function Tank(){
             if(!item){
                 this.player.blocks.splice(index, 0);
             } else{
-                if(item.material !== 42 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
+                if(item.material !== 42 && item.material !== 43 && this.bulletX + BULLET_SIZE >= item.x && this.bulletX <= item.x + item.width && this.bulletY <= item.y + item.height && this.bulletY >= item.y){
                 if(this.name === 'player'){
                     this.soundBulletHit2.play();
                 }
-                cancelAnimationFrame(id);
+                    this.flag = false;
 
                 if(item.material !== 2){
                     if(item.material === 6){
@@ -673,6 +688,7 @@ export function Tank(){
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
+                    this.flag = true;
                 }, this.delay);
                 }
             }
@@ -684,11 +700,12 @@ export function Tank(){
                 this.soundBulletHit1.play();
             }
 
-            cancelAnimationFrame(id);
+            this.flag = false;
 
             setTimeout(() => {
                 this.timer = true;
                 this.bullet = false;
+                this.flag = true;
             }, this.delay);
         }
 
@@ -697,23 +714,25 @@ export function Tank(){
                 if(this.bulletX + BULLET_SIZE >= this.player.enemies[i].posX && this.bulletX <= this.player.enemies[i].posX + TANK_SIZE && this.bulletY >= this.player.enemies[i].posY && this.bulletY <= this.player.enemies[i].posY + TANK_SIZE){
                     this.explosion();
                     this.player.tankKilled(i);
-                    cancelAnimationFrame(id);
+                    this.flag = false;
 
                     setTimeout(() => {
                         this.timer = true;
                         this.bullet = false;
+                        this.flag = true;
                     }, this.delay);
                 }
             }
         }else if(this.name === 'enemy'){
             if(this.bulletX + BULLET_SIZE >= this.player.tank.posX && this.bulletX <= this.player.tank.posX + TANK_SIZE && this.bulletY <= this.player.tank.posY + TANK_SIZE && this.bulletY >= this.player.tank.posY){
                 this.explosion();
-                cancelAnimationFrame(id);
+                this.flag = false;
                 this.player.revivalPlayer();
     
                 setTimeout(() => {
                     this.timer = true;
                     this.bullet = false;
+                    this.flag = true;
                 }, this.delay);
             }
         }
@@ -721,34 +740,21 @@ export function Tank(){
 
     //взрыв
     this.drawExplosion = () => {
-        let animId = null;
         this.view.drawExplosion(this.i, this.bulletX + TANK_SIZE / 2 - EXPLOSION_SIZE, this.bulletY - EXPLOSION_SIZE, EXPLOSION_SIZE * 2, EXPLOSION_SIZE * 2);
 
         if(this.animation){
-            animId = requestAnimationFrame(this.drawExplosion);
-        } else{
-            cancelAnimationFrame(animId);
-        }
+            requestAnimationFrame(this.drawExplosion);
+        } 
     }
 
     this.explosion = function(){
         this.animation = true;
-
-        let animId = requestAnimationFrame(this.drawExplosion);
+        requestAnimationFrame(this.drawExplosion);
 
         const interval = setInterval(() => {
-            cancelAnimationFrame(animId);
-
-            if(this.animation){
-                animId = requestAnimationFrame(this.drawExplosion);
-            } else{
-                cancelAnimationFrame(animId);
-            }
-
             this.i++;
 
             if(this.i > 19){
-                cancelAnimationFrame(animId);
                 this.animation = false;
                 this.i = 15;
                 clearInterval(interval);
@@ -759,7 +765,8 @@ export function Tank(){
     }
 
     this.delete = function(){
-        cancelAnimationFrame(this.mainAnim);
+        this.flag = false;
+        this.mainAnim = false;
     }
 
     this.loop = () => {
@@ -768,6 +775,9 @@ export function Tank(){
         this.drawTank();
         this.setPosBullet();
 
-        this.mainAnim = requestAnimationFrame(this.loop);
+        if(this.mainAnim){
+            requestAnimationFrame(this.loop);
+        }
+        
     }
 }

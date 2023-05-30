@@ -19,6 +19,40 @@ body{
     width: 100%;
     position: relative;
 }
+/* authorization start */
+.authorization{
+    position: relative;
+    top: 50%;
+    text-align: center;
+    transform: translate(0, -50%);
+}
+.authorization__title{
+    font-size: 40px;
+    margin-bottom: 30px;
+}
+.label__name{
+    display: block;
+    margin-bottom: 20px;
+}
+.input__name{
+    background: transparent;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+    color: #fff;
+    font-weight: 700;
+}
+.btn{
+    background: #fff;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 700;
+}
+.btn:active{
+    transform: scale(0.9);
+}
+/* authorization end */
 /* Start start */
 .menu{
     width: 100%;
@@ -37,7 +71,7 @@ body{
     width: 377px;
     height: 143px;
     background: url(img/sprite2.png);
-    background-position: -260px 0px;
+    background-position: -128px 0px;
     background-repeat: no-repeat;
     margin-bottom: 50px;
 }
@@ -170,29 +204,30 @@ body{
     position: relative;
 }
 .canvas__info {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
     color: #000;
     font-size: 30px;
 }
 .canvas__count-tank {
     display: grid;
     grid-template: 1fr / 1fr 1fr;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
+    position: absolute;
+    top: 10%;
 }
 .canvas__new_tank{
     display: inline-block;
     width: 22px;
     height: 22px;
     background: url(img/sprite2.png);
-    background-position: -160px -256px;
+    background-position: -32px -64px;
     background-repeat: no-repeat;
 }
 .canvas__lives{
     margin-bottom: 20px;
+}
+.canvas__players{
+    position: absolute;
+    bottom: 10%;
 }
 .canvas__player {
     font-weight: 900;
@@ -204,7 +239,7 @@ body{
     width: 32px;
     height: 21px;
     background: url(img/sprite2.png);
-    background-position: -128px -256px;
+    background-position: 0px -67px;
     background-repeat: no-repeat;
 }
 .canvas__stage::before{
@@ -213,7 +248,7 @@ body{
     width: 32px;
     height: 31px;
     background: url(img/sprite2.png);
-    background-position: -192px -256px;    
+    background-position: -64px -66px;    
     background-repeat: no-repeat;
     margin-right: 15px;
 }
@@ -264,7 +299,7 @@ body{
     margin: 0 auto 30px;
     border: 1px solid #fff;
     border-spacing: 20px;
-    display: none;
+    /* display: none; */
 }
 .active{
     display: inline-block;
@@ -521,7 +556,7 @@ body{
         width: 90px;
         height: 90px;
         top: 67%;
-        left: 22%;
+        left: 1%;
     }
     .canvas__arrow{
         width: 30px;
@@ -529,7 +564,7 @@ body{
     }
     .canvas__shoot {
         top: 69%;
-        right: 22%;
+        right: 1%;
         width: 70px;
         height: 70px;
     }

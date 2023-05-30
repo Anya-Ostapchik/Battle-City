@@ -3,6 +3,7 @@ import Statistics from "./Pages/Statistics.js";
 import Rules from "./Pages/Rules.js";
 import Level from "./Pages/Level.js";
 import Game from "./Pages/Game.js";
+import Authorization from "./Pages/Authorization.js";
 import ErrorPage from "./Pages/ErrorPage.js";
 
 const components = {
@@ -15,6 +16,7 @@ const routes = {
   rules: Rules,
   level: Level,
   game: Game,
+  authorization: Authorization,
   default: HomePage,
   error: ErrorPage,
 };
@@ -48,6 +50,16 @@ const mySPA = (function () {
 
       window.document.title = routes[routeName].title;
       contentContainer.innerHTML = routes[routeName].render();
+
+      if(_hashPageName === 'authorization'){
+        const input = document.querySelector('.input__name');
+        const btn = document.querySelector('.btn');
+        btn.addEventListener('click', function (e){
+            e.preventDefault();
+            localStorage.setItem('PlayerName', input.value)
+            location.hash = '#main';
+        });
+      }
 
       if(_hashPageName === 'game'){
         const level = document.querySelector('.level');
@@ -102,13 +114,19 @@ const mySPA = (function () {
     }
 
     this.updateState = function(_pageName) {
-      if(sessionStorage.getItem("is_reloaded")){
+      if(localStorage.getItem('PlayerName') === null){
+        location.hash = '#authorization';
+        _pageName = 'authorization';
+      }else if(localStorage.getItem('PlayerName') !== null && sessionStorage.getItem("is_reloaded")){
+        location.hash = '#main';
         _pageName = 'main';
       }
+
       if(_pageName === 'statistics'){
         this.response();
       }
-        myModuleView.renderContent(_pageName);
+
+      myModuleView.renderContent(_pageName);
     }
 
     this.response = function(){
@@ -129,55 +147,96 @@ const mySPA = (function () {
       }
   
       function listUsers(users){
-        const table = document.querySelector('.statistics__table');
+        const statistics = document.querySelector('.statistics');
 
           if(users.length === 0){
-            table.classList.add('active');
+            const tableMain = document.createElement('table');
+            tableMain.classList.add('statistics__table');
+            const trMain = document.createElement('tr');
+            const th1 = document.createElement('th');
+            th1.textContent = 'Name';
+            const th2 = document.createElement('th');
+            th2.textContent = 'Points';
+            trMain.append(th1, th2);
+            tableMain.append(trMain);
+            statistics.prepend(tableMain);
           }else if(users.length <= 5){
-            for(let i = users.length - 1; i > 0; i--){
+            const tableMain = document.createElement('table');
+            tableMain.classList.add('statistics__table');
+            const trMain = document.createElement('tr');
+            const th1 = document.createElement('th');
+            th1.textContent = 'Name';
+            const th2 = document.createElement('th');
+            th2.textContent = 'Points';
+            trMain.append(th1, th2);
+            tableMain.append(trMain);
+
+            for(let i = users.length - 1; i >= 0; i--){
               const tr = document.createElement('tr');
-                const td1 = document.createElement('td');
-                const td2 = document.createElement('td');
-                td1.textContent = users[i].name;
-                td2.textContent = users[i].score;
-                tr.append(td1, td2);
-              table.append(tr);
-            }
-            table.classList.add('active');
-          }else{
-              const tr = document.createElement('tr');
-  
               const td1 = document.createElement('td');
-              const table1 = document.createElement('table');
-              table1.classList.add('nested-table');
-              for(let i = users.length - 1; i > users.length - 1 - 5; i--){
-                const tr1 = document.createElement('tr');
-                const td1 = document.createElement('td');
-                const td2 = document.createElement('td');
-                td1.textContent = users[i].name;
-                td2.textContent = users[i].score;
-                tr1.append(td1, td2);
-                table1.append(tr1);
-              }
-              td1.append(table1);
-  
               const td2 = document.createElement('td');
-              const table2 = document.createElement('table');
-              table2.classList.add('nested-table');
-              for(let i = users.length - 1 - 5; i > users.length - 1 - 10; i--){
-                const tr2 = document.createElement('tr');
-                const td1 = document.createElement('td');
-                const td2 = document.createElement('td');
-                td1.textContent = users[i].name;
-                td2.textContent = users[i].score;
-                tr2.append(td1, td2);
-                table2.append(tr2);
-              }
-              td2.append(table2);
-  
+              td1.textContent = users[i].name;
+              td2.textContent = users[i].score;
               tr.append(td1, td2);
-              table.append(tr)
-              table.classList.add('active');
+              tableMain.append(tr);
+            }
+
+            statistics.prepend(tableMain);
+          }else{
+            const tableMain = document.createElement('table');
+            tableMain.classList.add('statistics__table');
+
+            const trMain = document.createElement('tr');
+
+            const td1 = document.createElement('td');
+            const table1 = document.createElement('table');
+            table1.classList.add('nested-table');
+
+            const tr = document.createElement('tr');
+            const th1 = document.createElement('th');
+            th1.textContent = 'Name';
+            const th2 = document.createElement('th');
+            th2.textContent = 'Points';
+            tr.append(th1, th2);
+            table1.append(tr);
+
+            for(let i = users.length - 1; i > users.length - 1 - 5; i--){
+              const tr1 = document.createElement('tr');
+              const td1 = document.createElement('td');
+              const td2 = document.createElement('td');
+              td1.textContent = users[i].name;
+              td2.textContent = users[i].score;
+              tr1.append(td1, td2);
+              table1.append(tr1);
+            }
+            td1.append(table1);
+
+            const td2 = document.createElement('td');
+            const table2 = document.createElement('table');
+            table2.classList.add('nested-table');
+            const tr2 = document.createElement('tr');
+            const th3 = document.createElement('th');
+            th3.textContent = 'Name';
+            const th4 = document.createElement('th');
+            th4.textContent = 'Points';
+            tr2.append(th3, th4);
+            table2.append(tr2);
+
+            for(let i = users.length - 1 - 5; i > users.length - 1 - 10; i--){
+              const tr2 = document.createElement('tr');
+              const td1 = document.createElement('td');
+              const td2 = document.createElement('td');
+              td1.textContent = users[i].name;
+              td2.textContent = users[i].score;
+              tr2.append(td1, td2);
+              table2.append(tr2);
+            }
+            td2.append(table2);
+
+            trMain.append(td1, td2);
+            tableMain.append(trMain)
+
+            statistics.prepend(tableMain);
         }
       }
   
@@ -223,8 +282,7 @@ const mySPA = (function () {
   return {
     init: function (root, routes, components) {
       sessionStorage.setItem("is_reloaded", true);
-      location.hash = '#main';
-
+      
       this.renderComponents(root, components);
 
       const view = new ModuleView();

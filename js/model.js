@@ -7,8 +7,9 @@ import { Tank } from "./tank.js";
 export function Model(){
     this.direction = 7;
     this.i = 15;
-    this.level = 1;
+    this.level = 5;
     this.numLives = 5;
+    this.flag = true;
     
     this.init = function(view){
         this.myView = view;
@@ -19,13 +20,6 @@ export function Model(){
         this.soundMotor = new Audio('sound/sound_motor.ogg');
         this.soundMotor.loop = true;
         this.soundMotor.volume = 0.2;
-
-        if(localStorage.getItem('PlayerName') === null){
-            this.playerName = prompt('Write your name');
-            localStorage.setItem('PlayerName', this.playerName);
-        } else if(localStorage.getItem('PlayerName') === undefined){
-            localStorage.setItem('PlayerName', 'Player');
-        }
     }
 
     this.getCanvas = function () {
@@ -35,6 +29,10 @@ export function Model(){
     this.field = () => {
         for(let i = 0; i < this.blocks.length; i++){
             this.myView.drawField(spriteMap[this.blocks[i].material], this.blocks[i].x, this.blocks[i].y, this.blocks[i].width, this.blocks[i].height);
+        }
+        if(this.flag){
+            requestAnimationFrame(this.field);
+
         }
     }
 
@@ -66,7 +64,7 @@ export function Model(){
         this.playerY = CANVAS_HEIGHT - TANK_SIZE;
 
         this.tank = new Tank();
-        this.tank.init('player', this.myView, this, this.playerX, this.playerY, 4, 250);
+        this.tank.init('player', this.myView, this, this.playerX, this.playerY, 4, 300);
 
 
         this.getElemsMap();
@@ -75,6 +73,7 @@ export function Model(){
 
         setTimeout(() => {
             this.start();
+            requestAnimationFrame(this.field);
         }, 5000);
     }
 
@@ -107,6 +106,7 @@ export function Model(){
     }
 
     this.nextLevel = function(){
+        this.flag = true;
         this.soundMotor.play();
         this.soundMovement.play();
         this.level++;
@@ -160,6 +160,7 @@ export function Model(){
     }
     
     this.gameOver = () => {
+        this.flag = false;
         this.eagleState = 21;
         this.soundMotor.pause();
         this.soundMovement.pause();
@@ -169,13 +170,14 @@ export function Model(){
 
         for(let i = this.enemies.length - 1; i >= 0; i--){
             this.enemies[i].delete();
-            this.enemies.splice([i], 1);
         }
 
-        cancelAnimationFrame(this.mainAnimId);
+        let user = {
+            name: localStorage.getItem('PlayerName'),
+            score: this.score
+        };
 
         setTimeout(() => {
-            cancelAnimationFrame(this.clearId);
             this.soundGameOver.play();
             this.myView.gameOver();
         }, 1000);
@@ -186,26 +188,24 @@ export function Model(){
 
         setTimeout(() => {
             location.hash = '#main';
-            this.statictic();
+            this.statictic(user);
         }, 5000);
     }
 
     this.start = function(){
-        this.id = requestAnimationFrame(this.loop);
+        requestAnimationFrame(this.loop);
     }
 
     this.clear = () => {
         this.myView.clearField();
-        this.clearId = requestAnimationFrame(this.clear);
+        if(this.flag){
+            requestAnimationFrame(this.clear);
+        }
     }
 
-    this.statictic = async function(){
-        let user = {
-            name: localStorage.getItem('PlayerName'),
-            score: this.score
-        };
+    this.statictic = async function(user){
         try{
-            fetch('http://localhost:9090/users', {
+            await fetch('http://localhost:9090/users', {
                 method: 'POST',
                 body: JSON.stringify(user),
                 headers: {
@@ -218,21 +218,23 @@ export function Model(){
     }
 
     this.loop = () => {
+        if(this.flag){
+            requestAnimationFrame(this.loop);
+        }
         this.myView.drawEagle(this.eagleState);
         this.tank.getParams(this.direction);
         this.playerOneKeydown();
         this.drawEnemyTanks();
-        this.field();
-        this.mainAnimId = requestAnimationFrame(this.loop);
 
-        if(this.dt === 20 && this.level === 2){
+        if(this.dt === 20 && this.level === 4){
             this.gameOver();
-        }
-
-        if(this.dt === 20){
+        } else if(this.dt === 20){
+            this.flag = false;
+            for(let i = this.enemies.length - 1; i >= 0; i--){
+                this.enemies[i].delete();
+            }    
             this.soundMotor.pause();
             this.soundMovement.pause();
-            cancelAnimationFrame(this.mainAnimId);
             this.blocks = [];
             this.enemies = [];
             this.dt = 0;
