@@ -97,7 +97,7 @@ export function Model(){
                 this.enemies[this.countTanks].loop();
                 
                 this.countTanks++;
-                if(this.allEnemiesTanks < 20){
+                if(this.allEnemiesTanks <= 20){
                     this.myView.deleteTankIcon();
                 }
             }
